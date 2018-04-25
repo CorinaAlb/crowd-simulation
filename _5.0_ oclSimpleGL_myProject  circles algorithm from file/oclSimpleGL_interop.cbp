@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="oclSimpleGL_interop" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/oclSimpleGL_interop" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="/opt/NVIDIA_GPU_Computing_SDK/shared/inc" />
+					<Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc" />
+				</Compiler>
+				<Linker>
+					<Add library="OpenCL" />
+					<Add library="shrutil_x86_64" />
+					<Add library="GLEW_x86_64" />
+					<Add library="oclUtil_x86_64" />
+					<Add library="glut" />
+					<Add library="GLU" />
+					<Add library="GL" />
+					<Add directory="/opt/NVIDIA_GPU_Computing_SDK/shared/lib/linux" />
+					<Add directory="/opt/NVIDIA_GPU_Computing_SDK/shared/lib" />
+					<Add directory="/opt/NVIDIA_GPU_Computing_SDK/OpenCL/common/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/oclSimpleGL_interop" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="oclSimpleGL.cpp" />
+		<Unit filename="simpleGL.cl" />
+		<Unit filename="world.ads" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
