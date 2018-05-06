@@ -159,7 +159,7 @@ GLfloat *points_position;
 GLfloat *points_velocity;
 GLfloat *points_old_position;
 GLfloat *points_color;
-GLfloat *collision_map;
+GLint *collision_map;
 
 GLfloat *path_faithful;
 GLfloat *gravitational_force;
@@ -414,7 +414,7 @@ void InitGL(int* argc, char** argv)
     shrCheckErrorEX(bGLEW, shrTRUE, pCleanup);
 
     // default initialization
-    glClearColor(0.0, 0.75, 1.0, 0.0);
+    glClearColor(0.0, 0.25, 0.25, 0.5);
     glDisable(GL_DEPTH_TEST);
 
     // viewport
@@ -448,6 +448,7 @@ void runKernel()
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 #endif
     size_t szGlobalWorkSize[] = {(size_t) no_points, 1};
+    size_t szGlobalWorkSizeDouble[] = {(size_t) no_points, 2};
     ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_clean_collision_map, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
     ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_create_collision_map, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
@@ -543,7 +544,7 @@ void init_world()
 
             points_velocity = new GLfloat [2 * no_points];
 
-            collision_map = new GLfloat [6 * 4 * no_points];
+            collision_map = new GLint [6 * 2 * no_points];
 
             for (int i=0; i < 2 * no_points; i++)
             {
@@ -789,7 +790,7 @@ void createVBOColors(GLuint* vbo)
 void createVBOCollisionMap(GLuint* vbo)
 {
      // create VBO
-    unsigned int size = no_points * 6 * 4 * sizeof(GLfloat);
+    unsigned int size = no_points * 6 * 2 * sizeof(GLint);
 
     if(!bQATest)
     {
