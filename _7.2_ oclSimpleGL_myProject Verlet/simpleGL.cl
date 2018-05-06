@@ -1,7 +1,7 @@
 // ! entities are POINTS
 
-#define NO_POINTS                   10
-#define LIMIT_PROXIMITY             0.05
+#define NO_POINTS                   50
+#define LIMIT_PROXIMITY             0.04
 #define MAX_POINTS_ON_LIMIT         6
 #define BACK_OFF                    0.005
 #define BOUNCING_SPEED_MODIFIER     0.95
