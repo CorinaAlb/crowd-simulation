@@ -158,6 +158,7 @@ void Cleanup(int iExitCode);
 void (*pCleanup)(int) = &Cleanup;
 
 int no_points;
+int no_attractions;
 
 GLfloat *points_position;
 GLfloat *points_velocity;
@@ -463,7 +464,7 @@ void runKernel()
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 #endif
     size_t szGlobalWorkSize[] = {(size_t) no_points, 1};
-    size_t szGlobalWorkSizeAttraction[] = {(size_t) 1, 1};
+    size_t szGlobalWorkSizeAttraction[] = {(size_t) no_attractions, 1};
 
     ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_clean_collision_map, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
@@ -473,7 +474,7 @@ void runKernel()
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
     ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_move_to_target_path_faithful, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-    ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_attraction, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
+    ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_attraction, 1, NULL, szGlobalWorkSizeAttraction, NULL, 0, 0, 0 );
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 #ifdef GL_INTEROP
     // unmap buffer object
@@ -542,6 +543,7 @@ void init_world()
         char *line_char;
         char *pointer;
         int no_points_index = -1;
+        int no_attractions_index = -1;
         int no_old_points_index = -1;
         int no_colors_index = -1;
         int no_target_points_index = -1;
@@ -575,6 +577,18 @@ void init_world()
             {
                 collision_map[i] = 0.0f;
             }
+        }
+
+        getline(myfile, line);
+
+        if (line.compare(0, 14, "no_attractions") == 0)
+        {
+            line_char = strdup(line.c_str());
+            strtok_r(line_char, ":", &pointer);
+            char *no_attractions_char = strtok_r(NULL, ":", &pointer);
+            no_attractions = atoi(no_attractions_char);
+
+            attraction_map = new GLint [2 * no_attractions];
         }
 
         for (int i=0; i < no_points; i++)
@@ -643,8 +657,8 @@ void init_world()
                     {
                         char *attracted_by_char = strtok_r(NULL, "| ", &pointer);
 
-                        attraction_map[0] = no_points_index / 2;
-                        attraction_map[1] = atoi(attracted_by_char);
+                        attraction_map[++no_attractions_index] = no_points_index / 2;
+                        attraction_map[++no_attractions_index] = atoi(attracted_by_char);
                     }
 
                     info = strtok_r(NULL, "| ", &pointer);
@@ -880,7 +894,7 @@ void createVBOGravitationalForce(GLuint* vbo)
 
 void createVBOAttractionMap(GLuint* vbo)
 {
-    unsigned int size = 2 * sizeof(GLint);
+    unsigned int size = 2 * no_attractions * sizeof(GLint);
 
     if(!bQATest)
     {

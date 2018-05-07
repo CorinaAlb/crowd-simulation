@@ -1,6 +1,6 @@
 // ! entities are POINTS
 
-#define NO_POINTS                   2
+#define NO_POINTS                   3
 #define LIMIT_PROXIMITY             0.05
 #define MAX_POINTS_ON_LIMIT         6
 #define BACK_OFF                    0.005
@@ -65,14 +65,14 @@ __kernel void attraction(__global float2* pos, __global int2* attraction_influen
 {
     unsigned int gid = get_global_id(0);
 
-    int influenced_point_index = attraction_influence[0].x;
-    int atracted_by_index = attraction_influence[1].x;
+    int influenced_point_index = attraction_influence[gid].x;
+    int atracted_by_index = attraction_influence[gid].y;
 
-    float sign_x = (pos[atracted_by_index].x - pos[gid].x) > 0.0f; // == 1 -> positive value
-    float sign_y = (pos[atracted_by_index].y - pos[gid].y) > 0.0f; // == 1 -> positive value
+    float sign_x = (pos[atracted_by_index].x - pos[influenced_point_index].x) > 0.0f; // == 1 -> positive value
+    float sign_y = (pos[atracted_by_index].y - pos[influenced_point_index].y) > 0.0f; // == 1 -> positive value
 
-    pos[gid].x += ( (sign_x == 1) - (sign_x != 1) ) * ATTRACTION_FORCE * (gid == influenced_point_index);
-    pos[gid].y += ( (sign_y == 1) - (sign_y != 1) ) * ATTRACTION_FORCE * (gid == influenced_point_index);
+    pos[influenced_point_index].x += ( (sign_x == 1) - (sign_x != 1) ) * ATTRACTION_FORCE;
+    pos[influenced_point_index].y += ( (sign_y == 1) - (sign_y != 1) ) * ATTRACTION_FORCE;
 }
 
 // avoid redundant computations
