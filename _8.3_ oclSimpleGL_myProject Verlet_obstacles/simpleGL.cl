@@ -145,89 +145,30 @@ __kernel void map_obstacles_to_pieces(__global float4 pieces_coordinates_x, __gl
         // 4. end point outside & start point outside
         int case_four = (start_point_inside == 0) && (end_point_inside == 0);
 
-        if (case_one)
-        {
-            obstacles_index += 1;
+        obstacles_index += 1;
 
-            starting_points_obstacles[obstacles_index].x = start_obstacle_position_x;
-            starting_points_obstacles[obstacles_index].y = start_obstacle_position_y;
+        starting_points_obstacles[obstacles_index].x = (case_one == 1) * start_obstacle_position_x
+            + (case_two == 1) * start_obstacle_position_x
+            + (case_three == 1) * (max_x * (start_obstacle_position_x > max_x) + min_x * (start_obstacle_position_x < min_x))
+            + (case_four == 1) * (min_x * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
+            + start_obstacle_position_x * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0));
 
-            ending_points_obstacles[obstacles_index].x = end_obstacle_position_x;
-            ending_points_obstacles[obstacles_index].y = end_obstacle_position_y;
-        }
+        starting_points_obstacles[obstacles_index].y = (case_one == 1) * start_obstacle_position_y
+            + (case_two == 1) * start_obstacle_position_y
+            + (case_three == 1) * (max_y * (start_obstacle_position_y > max_y) + min_y * (start_obstacle_position_y < min_y))
+            + (case_four == 1) * (max_y * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0)
+            + start_obstacle_position_y * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1));
 
-        if (case_two)
-        {
-            obstacles_index += 1;
+        ending_points_obstacles[obstacles_index].x = (case_one == 1) * end_obstacle_position_x
+            + (case_two == 1) * (max_x * (end_obstacle_position_x >= max_x) + min_x * (end_obstacle_position_x =< min_x))
+            + (case_three == 1) * end_obstacle_position_x
+            + (case_four == 1) * (max_x * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
+            + end_obstacle_position_x * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0));
 
-            starting_points_obstacles[obstacles_index].x = start_obstacle_position_x;
-            starting_points_obstacles[obstacles_index].y = start_obstacle_position_y;
-
-            ending_points_obstacles[obstacles_index].x = max_x * (end_obstacle_position_x >= max_x) + min_x * (end_obstacle_position_x =< min_x);
-            ending_points_obstacles[obstacles_index].y = max_y * (end_obstacle_position_y >= max_y) + min_y * (end_obstacle_position_y =< min_y);
-
-//            {
-//                ending_points_obstacles[obstacles_index].x = end_obstacle_position_x;
-//            }
-
-
-//            {
-//                ending_points_obstacles[obstacles_index].y = end_obstacle_position_y;
-//            }
-        }
-
-        if (case_three)
-        {
-            obstacles_index += 1;
-
-            ending_points_obstacles[obstacles_index].x = end_obstacle_position_x;
-            ending_points_obstacles[obstacles_index].y = end_obstacle_position_y;
-
-            starting_points_obstacles[obstacles_index].x = max_x * (start_obstacle_position_x > max_x) + min_x * (start_obstacle_position_x < min_x);
-            starting_points_obstacles[obstacles_index].y = max_y * (start_obstacle_position_y > max_y) + min_y * (start_obstacle_position_y < min_y);
-
-//            {
-//                starting_points_obstacles[obstacles_index].x = start_obstacle_position_x;
-//            }
-
-//            {
-//                starting_points_obstacles[obstacles_index].y = start_obstacle_position_y;
-//            }
-        }
-
-        if (case_four)
-        {
-//            if (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
-//            {
-                starting_points_obstacles[obstacles_index].x = min_x * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
-                                                + start_obstacle_position_x * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0);
-                starting_points_obstacles[obstacles_index].y = start_obstacle_position_y * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
-                                                + max_y * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0);
-
-                ending_points_obstacles[obstacles_index].x = max_x * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
-                                                + end_obstacle_position_x * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0);
-                ending_points_obstacles[obstacles_index].y = end_obstacle_position_y * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
-                                                + min_y * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0);
-//            }
-//            else if (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0)
-//            {
-//                starting_points_obstacles[obstacles_index].x = start_obstacle_position_x;
-//                starting_points_obstacles[obstacles_index].y = max_y;
-//
-//                ending_points_obstacles[obstacles_index].x = end_obstacle_position_x;
-//                ending_points_obstacles[obstacles_index].y = min_y;
-//            }
-
-        }
-
-//        obstacles_index += start_point_inside_x * start_point_inside_y;
-//
-//        starting_points_obstacles[obstacles_index].x += start_point_inside_x * start_point_inside_y * obstacle_positions[i * 2].x;
-//        starting_points_obstacles[obstacles_index].y += start_point_inside_x * start_point_inside_y * obstacle_positions[i * 2].y;
-//
-//        ending_points_obstacles[obstacles_index].x += end_point_inside_x * end_point_inside_y * obstacle_positions[i * 2 + 1].x;
-//        ending_points_obstacles[obstacles_index].y += end_point_inside_x * end_point_inside_y * obstacle_positions[i * 2 + 1].y;
+        ending_points_obstacles[obstacles_index].y = (case_one == 1) * end_obstacle_position_y
+            + (case_two == 1) * (max_y * (end_obstacle_position_y >= max_y) + min_y * (end_obstacle_position_y =< min_y))
+            + (case_three == 1) * end_obstacle_position_y
+            + (case_four == 1) * (min_y * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0)
+            + end_obstacle_position_y * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1));
     }
-
-
 }
