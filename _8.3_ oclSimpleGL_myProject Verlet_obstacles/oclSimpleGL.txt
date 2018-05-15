@@ -1,0 +1,38 @@
+/home/corina/CodeBlocks projects/crowd-simulation/_8.3_ oclSimpleGL_myProject Verlet_obstacles/bin/Debug/oclSimpleGL_interop Starting...
+
+Calling InitGL...
+
+Using CL-GL Interop...
+
+Device # 0, GeForce GTX 950M
+
+ !!! Error # -11 at file /home/corina/CodeBlocks projects/crowd-simulation/_8.3_ oclSimpleGL_myProject Verlet_obstacles/oclSimpleGL.cpp, line 348
+
+
+-----------------------------------------------------------
+
+Build Log:
+<kernel>:92:55: error: parameter may not be qualified with an address space
+__kernel void map_obstacles_to_pieces(__global float4 pieces_coordinates_x, __global float4 pieces_coordinates_y,
+                                                      ^
+<kernel>:92:93: error: parameter may not be qualified with an address space
+__kernel void map_obstacles_to_pieces(__global float4 pieces_coordinates_x, __global float4 pieces_coordinates_y,
+                                                                                            ^
+<kernel>:93:37: error: parameter may not be qualified with an address space
+                    __global float2 obstacle_positions, __global float2 starting_points_obstacles, __global float2 ending_points_obstacles, int no_obstacles)
+                                    ^
+<kernel>:93:73: error: parameter may not be qualified with an address space
+                    __global float2 obstacle_positions, __global float2 starting_points_obstacles, __global float2 ending_points_obstacles, int no_obstacles)
+                                                                        ^
+<kernel>:93:116: error: parameter may not be qualified with an address space
+                    __global float2 obstacle_positions, __global float2 starting_points_obstacles, __global float2 ending_points_obstacles, int no_obstacles)
+                                                                                                                   ^
+
+-----------------------------------------------------------
+
+
+Writing ptx to separate file: oclSimpleGL.ptx ...
+
+
+Starting Cleanup...
+
