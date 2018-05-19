@@ -43,6 +43,8 @@
 //*****************************************************************************
 #define REFRESH_DELAY	    10 //ms
 
+#define MIN_POINT_SIZE      4
+
 // Rendering window vars
 const unsigned int window_width  = 1000;
 const unsigned int window_height = 1000;
@@ -62,47 +64,75 @@ char*       cPathAndName    = NULL;          // var for full paths to data, src,
 char*       cSourceCL       = NULL;             // Buffer to hold source for compilation
 const char* cExecutableName = NULL;
 
+void init_world();
+void map_obstacles_to_matrix();
+
 /**
  *  MATRIX DEFINITION
  */
 int     matrix_size;
 GLfloat *matrix;
-GLfloat *matrix_x;
-GLfloat *matrix_y;
+GLint   *matrix_x;
+GLint   *matrix_y;
 GLuint  vbo_matrix;
+GLuint  vbo_matrix_x;
+GLuint  vbo_matrix_y;
 cl_mem  vbo_cl_matrix;
+cl_mem  vbo_cl_matrix_x;
+cl_mem  vbo_cl_matrix_y;
 
 void init_matrix();
-void init_world();
 void createVBOMatrix(GLuint* vbo);
+void createVBOMatrixX(GLuint* vbo);
+void createVBOMatrixY(GLuint* vbo);
 
 /**
  *  OBSTACLES POSITIONS DEFINITION
  */
 int     no_obstacles;
 GLfloat *obstacle_positions;
-GLfloat *obstacle_positions_x;
-GLfloat *obstacle_positions_y;
 GLuint  vbo_obstacles;
-cl_mem  vbo_cl_obstacles;
+GLuint  vbo_obstacle_positions;
+cl_mem  vbo_cl_obstacle_positions;
 
-void createVBOObstacles(GLuint* vbo);
+void createVBOObstaclePositions(GLuint* vbo);
 
 /**
  *  OBSTACLES COLOR DEFINITION
  */
 GLfloat *obstacle_colors;
+GLuint  vbo_obstacle_colors;
+cl_mem  vbo_cl_obstacle_colors;
+
+void createVBOObstacleColors(GLuint* vbo);
 
 /**
  *  POINTS POSITIONS DEFINITION
  */
 int no_points;
 GLfloat *points_position;
+GLuint  vbo_points_positon;
+cl_mem  vbo_cl_points_position;
+
+void createVBOPointsPosition(GLuint* vbo);
 
 /**
  *  POINTS COLOR DEFINITION
  */
 GLfloat *points_color;
+GLuint  vbo_points_color;
+cl_mem  vbo_cl_points_color;
+
+void createVBOPointsColor(GLuint* vbo);
+
+/**
+ *  POINTS TARGET DEFINITION
+ */
+GLfloat *points_target;
+GLuint vbo_points_target;
+cl_mem vbo_cl_points_target;
+
+void createVBOPointsTarget(GLuint* vbo);
 
 /**
  *  ATTRACTION RELATIONS DEFINITION
@@ -111,22 +141,18 @@ int no_attractions;
 
 
 // vbo variables
-//GLuint vbo_obstacle_positions;
-//GLuint vbo_obstacle_colors;
+
 //GLuint vbo_old_positions;
 //GLuint vbo_target_positions;
 //GLuint vbo_velocity;
-//GLuint vbo_colors;
 //GLuint vbo_path_faithful;
 //GLuint vbo_gravitational_force;
 //GLuint vbo_attraction_map;
 
 //cl_mem vbo_cl_target_positions;
-//cl_mem vbo_cl_obstacle_positions;
-//cl_mem vbo_cl_obstacle_colors;
+
 //cl_mem vbo_cl_old_positions;
 //cl_mem vbo_cl_velocity;
-//cl_mem vbo_cl_colors;
 //cl_mem vbo_cl_collision_map;
 //cl_mem vbo_cl_path_faithful;
 //cl_mem vbo_cl_gravitational_force;
@@ -155,10 +181,7 @@ void runKernel();
 // GL functionality
 void InitGL(int* argc, char** argv);
 
-//void createVBOObstaclePositions(GLuint* vbo);
-//void createVBOObstacleColors(GLuint* vbo);
 //void createVBOTargetPositions(GLuint* vbo);
-//void createVBOColors(GLuint* vbo);
 //void createVBOCollisionMap(GLuint* vbo);
 //void createVBOPathFaithful(GLuint* vbo);
 //void createVBOOldPositions(GLuint* vbo);
@@ -172,6 +195,7 @@ void timerEvent(int value);
 /**
  *  KERNELS
  */
+cl_kernel ckKernel_labirinth;
 //cl_kernel ckKernel_create_collision_map;
 //cl_kernel ckKernel_compute_velocity;
 //cl_kernel ckKernel_clean_collision_map;
@@ -183,15 +207,9 @@ void timerEvent(int value);
 void Cleanup(int iExitCode);
 void (*pCleanup)(int) = &Cleanup;
 
-//int no_attractions;
-//int no_obstacles;
-
-//GLfloat *obstacle_positions;
-//GLfloat *obstacle_colors;
 //GLfloat *points_target_position;
 //GLfloat *points_velocity;
 //GLfloat *points_old_position;
-//GLfloat *points_color;
 //GLfloat *path_faithful;
 //GLfloat *gravitational_force;
 //
@@ -374,10 +392,13 @@ int main(int argc, char** argv)
 
     init_matrix();
     init_world();
+    map_obstacles_to_matrix();
 
     /**
      *  KERNELS & VBOs CREATION
      */
+    ckKernel_labirinth = clCreateKernel(cpProgram, "labirinth", &ciErrNum);
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ckKernel_move_to_target_path_faithful = clCreateKernel(cpProgram, "move_to_target_path_faithful", &ciErrNum);
 //    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ckKernel_compute_velocity = clCreateKernel(cpProgram, "compute_velocity", &ciErrNum);
@@ -391,19 +412,31 @@ int main(int argc, char** argv)
 
     // create VBO (if using standard GL or CL-GL interop), otherwise create Cl buffer
     createVBOMatrix(&vbo_matrix);
+    createVBOMatrixX(&vbo_matrix_x);
+    createVBOMatrixY(&vbo_matrix_y);
+    createVBOPointsPosition(&vbo_points_positon);
+    createVBOPointsColor(&vbo_points_color);
+    createVBOObstaclePositions(&vbo_obstacle_positions);
+    createVBOObstacleColors(&vbo_obstacle_colors);
+    createVBOPointsTarget(&vbo_points_target);
+
 //    createVBOTargetPositions(&vbo_target_positions);
 //    createVBOColors(&vbo_colors);
 //    createVBOPathFaithful(&vbo_path_faithful);
 //    createVBOOldPositions(&vbo_old_positions);
 //    createVBOVelocity(&vbo_velocity);
 //    createVBOGravitationalForce(&vbo_gravitational_force);
-//    createVBOObstaclePositions(&vbo_obstacle_positions);
-//    createVBOObstacleColors(&vbo_obstacle_colors);
 //    if (no_attractions > 0)
 //    {
 //        createVBOAttractionMap(&vbo_attraction_map);
 //    }
 //
+    ciErrNum  = clSetKernelArg(ckKernel_labirinth, 0, sizeof(cl_mem), (void *) &vbo_cl_points_position);
+    ciErrNum |= clSetKernelArg(ckKernel_labirinth, 1, sizeof(cl_mem), (void *) &vbo_cl_points_target);
+    ciErrNum |= clSetKernelArg(ckKernel_labirinth, 2, sizeof(cl_mem), (void *) &vbo_cl_matrix_x);
+    ciErrNum |= clSetKernelArg(ckKernel_labirinth, 3, sizeof(cl_mem), (void *) &vbo_cl_matrix_y);
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+
 //    ciErrNum  = clSetKernelArg(ckKernel_move_to_target_path_faithful, 0, sizeof(cl_mem), (void *) &vbo_cl_positions);
 //    ciErrNum |= clSetKernelArg(ckKernel_move_to_target_path_faithful, 1, sizeof(cl_mem), (void *) &vbo_cl_target_positions);
 //    ciErrNum |= clSetKernelArg(ckKernel_move_to_target_path_faithful, 2, sizeof(cl_mem), (void *) &vbo_cl_path_faithful);
@@ -498,6 +531,14 @@ void runKernel()
 #ifdef GL_INTEROP
     // map OpenGL buffer object for writing from OpenCL
     glFinish();
+    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_points_position, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_points_target, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_matrix_x, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_matrix_y, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_positions, 0, 0, 0 );
 //    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum |= clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_target_positions, 0, 0, 0 );
@@ -518,9 +559,11 @@ void runKernel()
 //        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    }
 #endif
-//    size_t szGlobalWorkSize[] = {(size_t) no_points, 1};
+    size_t szGlobalWorkSize[] = {(size_t) no_points, 1};
 //    size_t szGlobalWorkSizeDouble[] = {(size_t) no_points, 2};
 //    size_t szGlobalWorkSizeAttraction[] = {(size_t) no_attractions, 1};
+    ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_labirinth, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_compute_velocity, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
 //    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_move_to_target_path_faithful, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
@@ -532,6 +575,10 @@ void runKernel()
 //    }
 #ifdef GL_INTEROP
     // unmap buffer object
+    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_points_position, 0, 0, 0 );
+    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_points_target, 0, 0, 0 );
+    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_matrix_x, 0, 0, 0 );
+    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_matrix_y, 0, 0, 0 );
 //    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_positions, 0, 0, 0 );
 //    ciErrNum |= clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_target_positions, 0, 0, 0 );
 //    ciErrNum |= clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_old_positions, 0, 0, 0 );
@@ -579,26 +626,26 @@ void DisplayGL()
     glEnable(GL_PROGRAM_POINT_SIZE_EXT);
 
     glEnableClientState(GL_VERTEX_ARRAY);
-//    glBindBuffer(GL_ARRAY_BUFFER, vbo_matrix);
-//    glVertexPointer(2, GL_FLOAT, 0, 0);
-//
-//    glEnableClientState(GL_COLOR_ARRAY);
-//    glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
-//    glColorPointer(4, GL_FLOAT, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_points_positon);
+    glVertexPointer(2, GL_FLOAT, 0, 0);
 
-//    glPointSize(4);
-//    glDrawArrays(GL_POINTS, 0, matrix_size);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_points_color);
+    glColorPointer(4, GL_FLOAT, 0, 0);
 
-//    glEnableClientState(GL_VERTEX_ARRAY);
-//    glBindBuffer(GL_ARRAY_BUFFER, vbo_obstacle_positions);
-//    glVertexPointer(2, GL_FLOAT, 0, 0);
-//
-//    glEnableClientState(GL_COLOR_ARRAY);
-//    glBindBuffer(GL_ARRAY_BUFFER, vbo_obstacle_colors);
-//    glColorPointer(4, GL_FLOAT, 0, 0);
-//
-//    glLineWidth(5);
-//    glDrawArrays(GL_LINES, 0, no_obstacles);
+    glPointSize(MIN_POINT_SIZE);
+    glDrawArrays(GL_POINTS, 0, no_points);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_obstacle_positions);
+    glVertexPointer(2, GL_FLOAT, 0, 0);
+
+    glEnableClientState(GL_COLOR_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_obstacle_colors);
+    glColorPointer(4, GL_FLOAT, 0, 0);
+
+    glLineWidth(MIN_POINT_SIZE);
+    glDrawArrays(GL_LINES, 0, no_obstacles);
 
     glDisableClientState(GL_VERTEX_ARRAY);
 
@@ -627,31 +674,34 @@ void init_matrix()
     float m_increment_position_x = 0.01;
     float m_increment_position_y = 0.01;
 
-    matrix_size = 36480;
+    matrix_size = 37249;
     matrix = new GLfloat [2 * matrix_size];
-    matrix_x = new GLfloat [matrix_size];
-    matrix_y = new GLfloat [matrix_size];
+    matrix_x = new GLint [matrix_size];
+    matrix_y = new GLint [matrix_size];
 
     int matrix_size_index = -1;
     int matrix_xy_index   = -1;
 
-    for (int i=0; i<192; i++)
+    for (int i=0; i<193; i++)
     {
-        for (int j=0; j<190; j++)
+        for (int j=0; j<193; j++)
         {
             matrix[++matrix_size_index] = m_position_x;
             matrix[++matrix_size_index] = m_position_y;
-
-            matrix_xy_index += 1;
-            matrix_x[matrix_xy_index] = m_position_x;
-            matrix_y[matrix_xy_index] = m_position_y;
 
             m_position_x += m_increment_position_x;
         }
 
         m_position_y += m_increment_position_y;
         m_position_x = -0.96;
+
+        matrix_x[i] = 0;
+        matrix_y[i] = 0;
     }
+
+    printf("LAST Y float: %f\n", m_position_y);
+    int m_position_y_int = (int) (m_position_y * 100 + .5);
+    printf("LAST Y int: %d\n", m_position_y_int);
 }
 
 /**
@@ -667,12 +717,13 @@ void init_world()
         char *line_char;
         char *pointer;
         int no_points_index = -1;
-        int no_obstacles_index = -1;
-        int no_old_points_index = -1;
-        int no_attractions_index = -1;
         int no_colors_index = -1;
+        int no_obstacles_index = -1;
         int no_obstacles_colors_index = -1;
         int no_target_points_index = -1;
+
+//        int no_old_points_index = -1;
+//        int no_attractions_index = -1;
 
         getline(myfile, line);
 
@@ -684,8 +735,9 @@ void init_world()
             no_points = atoi(no_points_char);
 
             points_position = new GLfloat [2 * no_points];
+            points_target   = new GLfloat [2 * no_points];
+            points_color    = new GLfloat [4 * no_points];
 //            points_old_position = new GLfloat [2 * no_points];
-            points_color = new GLfloat [4 * no_points];
 //            path_faithful = new GLfloat [no_points];
 //            gravitational_force = new GLfloat [no_points];
 
@@ -769,6 +821,17 @@ void init_world()
                         points_position[++no_points_index] = position_x;
                         points_position[++no_points_index] = position_y;
                     }
+                    else if (strstr(info, "target"))
+                    {
+                        char *position_x_char = strtok_r(NULL, "| ", &pointer);
+                        char *position_y_char = strtok_r(NULL, "| ", &pointer);
+
+                        float position_x = atof(position_x_char);
+                        float position_y = atof(position_y_char);
+
+                        points_target[++no_target_points_index] = position_x;
+                        points_target[++no_target_points_index] = position_y;
+                    }
                     else if (strstr(info, "color"))
                     {
                         char *color_x_char = strtok_r(NULL, "| ", &pointer);
@@ -776,15 +839,21 @@ void init_world()
                         char *color_z_char = strtok_r(NULL, "| ", &pointer);
                         char *color_w_char = strtok_r(NULL, "| ", &pointer);
 
-                        float color_x = atof(color_x_char);
-                        float color_y = atof(color_y_char);
-                        float color_z = atof(color_z_char);
-                        float color_w = atof(color_w_char);
+                        no_colors_index += 1;
+                        points_color[no_colors_index] = atof(color_x_char);
+                        no_colors_index += 1;
+                        points_color[no_colors_index] = atof(color_y_char);
+                        no_colors_index += 1;
+                        points_color[no_colors_index] = atof(color_z_char);
+                        no_colors_index += 1;
+                        points_color[no_colors_index] = atof(color_w_char);
 
-                        points_color[++no_colors_index] = color_x;
-                        points_color[++no_colors_index] = color_y;
-                        points_color[++no_colors_index] = color_z;
-                        points_color[++no_colors_index] = color_w;
+//                        printf("COLORS: ");
+//                        for (int i=0; i<4; i++)
+//                        {
+//                            printf("%f ",points_color[i]);
+//                        }
+//                        printf("\n\n");
                     }
                     else if (strstr(info, "path_faithful"))
                     {
@@ -859,6 +928,73 @@ void init_world()
     }
 }
 
+/**
+ *  MAP OBSTACLES TO MATRIX
+ */
+void map_obstacles_to_matrix()
+{
+    for (int i = 0; i < no_obstacles / 2; i++)
+    {
+        int start_x = (int) (obstacle_positions[4 * i] * 100 + 96 + .5);
+        int start_y = (int) (obstacle_positions[4 * i + 1] * 100 + 96 + .5);
+        int end_x = (int) (obstacle_positions[4 * i + 2] * 100 + 96 + .5);
+        int end_y = (int) (obstacle_positions[4 * i + 3] * 100 + 96 + .5);
+
+        int m_position_x_int_start = 193 * start_y + start_x;
+        int m_position_y_int_start = 193 * start_x + start_y;
+        int m_position_x_int_end = 193 * end_y + end_x;
+        int m_position_y_int_end = 193 * end_x + end_y;
+
+        int min_x_start = m_position_x_int_start < m_position_x_int_end ? m_position_x_int_start : m_position_x_int_end;
+        int min_y_start = m_position_y_int_start < m_position_y_int_end ? m_position_y_int_start : m_position_y_int_end;
+
+        int max_x_end = min_x_start + fabs(m_position_x_int_start - m_position_x_int_end);
+        int max_y_end = min_y_start + fabs(m_position_y_int_start - m_position_y_int_end);
+
+        printf("min max X: %d %d  | %f %f ", min_x_start, max_x_end, obstacle_positions[4 * i], obstacle_positions[4 * i + 2]);
+        printf("%f %f\n", (m_position_x_int_start - 96) / 100, (m_position_x_int_end - 96) / 100);
+        printf("min max Y: %d %d  | %f %f ", min_y_start, max_y_end, obstacle_positions[4 * i + 1], obstacle_positions[4 * i + 3]);
+        printf("%f %f\n", (m_position_y_int_start - 96) / 100, (m_position_y_int_end - 96) / 100);
+
+        for (int k = min_x_start; k <= max_x_end; k++)
+        {
+            for (int j = min_y_start; j <= max_y_end; j++)
+            {
+                matrix_y[j] = 1;
+            }
+            matrix_x[k] = 1;
+
+            printf("x is 1 on possition: %d\n", k);
+        }
+    }
+
+    int position_x_in_matrix = (int) ((-0.1) * 100 + 96 + .5);
+    int position_y_in_matrix = (int) ((0.4) * 100 + 96 + .5);
+
+    printf("\n ppp %d %d | -0.1 0.4\n", position_x_in_matrix, position_y_in_matrix);
+    printf("-----------------\n%d %d\n-----------------\n\n", matrix_x[position_x_in_matrix], matrix_y[position_y_in_matrix]);
+
+    for (int i = position_x_in_matrix - 1; i <= position_x_in_matrix + 1; i++)
+    {
+        for (int j = position_y_in_matrix - 1; j <= position_y_in_matrix + 1; j++)
+        {
+            printf("%d %d\n", matrix_x[i], matrix_y[j]);
+        }
+    }
+
+//    printf("\n");
+//
+//    for (int i=0; i<387; i++)
+//    {
+//        printf("obstacle float x: %f\n", matrix_y[i]);
+//    }
+
+//    printf("obstacle int x: %d\n", m_position_x_int);
+//    printf("obstacle int y: %d\n", m_position_y_int);
+
+}
+
+
 void timerEvent(int value)
 {
     glutPostRedisplay();
@@ -901,102 +1037,228 @@ void createVBOMatrix(GLuint* vbo)
     }
 }
 
-// Create VBO
-//*****************************************************************************
-//void createVBOObstaclePositions(GLuint* vbo)
-//{
-//    // create VBO
-//    unsigned int size = no_obstacles * 2 * sizeof(GLfloat);
-//
-//    if(!bQATest)
-//    {
-//        // create buffer object
-//        glGenBuffers(1, vbo);
-//        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-//
-//        // initialize buffer object
-//        glBufferData(GL_ARRAY_BUFFER, size, obstacle_positions, GL_DYNAMIC_DRAW);
-//
-//        #ifdef GL_INTEROP
-//            // create OpenCL buffer from GL VBO
-//            vbo_cl_obstacle_positions = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
-//        #else
-//            // create standard OpenCL mem buffer
-//            vbo_cl_obstacle_positions = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
-//        #endif
-//        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-//    }
-//    else
-//    {
-//        // create standard OpenCL mem buffer
-//        vbo_cl_obstacle_positions = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
-//        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-//    }
-//}
-//
-//void createVBOObstacleColors(GLuint* vbo)
-//{
-//    // create VBO
-//    unsigned int size = no_obstacles * 4 * sizeof(GLfloat);
-//
-//    if(!bQATest)
-//    {
-//        // create buffer object
-//        glGenBuffers(1, vbo);
-//        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-//
-//        // initialize buffer object
-//        glBufferData(GL_ARRAY_BUFFER, size, obstacle_colors, GL_DYNAMIC_DRAW);
-//
-//        #ifdef GL_INTEROP
-//            // create OpenCL buffer from GL VBO
-//            vbo_cl_obstacle_colors = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
-//        #else
-//            // create standard OpenCL mem buffer
-//            vbo_cl_obstacle_colors = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
-//        #endif
-//        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-//    }
-//    else
-//    {
-//        // create standard OpenCL mem buffer
-//        vbo_cl_obstacle_colors = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
-//        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-//    }
-//}
+/** MATRIX X VBO **/
+void createVBOMatrixX(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = matrix_size * sizeof(GLint);
 
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 
-//void createVBOTargetPositions(GLuint* vbo)
-//{
-//    // create VBO
-//    unsigned int size = no_points * 2 * sizeof(GLfloat);
-//
-//    if(!bQATest)
-//    {
-//        // create buffer object
-//        glGenBuffers(1, vbo);
-//        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-//
-//        // initialize buffer object
-//        glBufferData(GL_ARRAY_BUFFER, size, points_target_position, GL_DYNAMIC_DRAW);
-//
-//        #ifdef GL_INTEROP
-//            // create OpenCL buffer from GL VBO
-//            vbo_cl_target_positions = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
-//        #else
-//            // create standard OpenCL mem buffer
-//            vbo_cl_target_positions = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
-//        #endif
-//        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-//    }
-//    else
-//    {
-//        // create standard OpenCL mem buffer
-//        vbo_cl_target_positions = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
-//        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-//    }
-//}
-//
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, matrix_x, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_matrix_x = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_matrix_x = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_matrix_x = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** MATRIX Y VBO **/
+void createVBOMatrixY(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = matrix_size * sizeof(GLint);
+
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, matrix_y, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_matrix_y = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_matrix_y = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_matrix_y = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** POINTS' POSITION VBO **/
+void createVBOPointsPosition(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = no_points * 2 * sizeof(GLfloat);
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, points_position, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_points_position = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_points_position = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_points_position = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** POINTS' COLOR VBO **/
+void createVBOPointsColor(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = no_points * 4 * sizeof(GLfloat);
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, points_color, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_points_color = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_points_color = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_points_color = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** POINTS' TARGET VBO**/
+void createVBOPointsTarget(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = no_points * 2 * sizeof(GLfloat);
+
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, points_target, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_points_target = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_points_target = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_points_target = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** OBSTACLES' POSITION VBO**/
+void createVBOObstaclePositions(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = no_obstacles * 2 * sizeof(GLfloat);
+
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, obstacle_positions, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_obstacle_positions = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_obstacle_positions = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_obstacle_positions = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** OBSTACLES' COLOR VBO**/
+void createVBOObstacleColors(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = no_obstacles * 4 * sizeof(GLfloat);
+
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, obstacle_colors, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_obstacle_colors = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_obstacle_colors = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_obstacle_colors = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
 //void createVBOOldPositions(GLuint* vbo)
 //{
 //    // create VBO
@@ -1116,36 +1378,6 @@ void createVBOMatrix(GLuint* vbo)
 //    {
 //        // create standard OpenCL mem buffer
 //        vbo_cl_attraction_map = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
-//        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-//    }
-//}
-//
-//void createVBOColors(GLuint* vbo)
-//{
-//    // create VBO
-//    unsigned int size = no_points * 4 * sizeof(GLfloat);
-//    if(!bQATest)
-//    {
-//        // create buffer object
-//        glGenBuffers(1, vbo);
-//        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-//
-//        // initialize buffer object
-//        glBufferData(GL_ARRAY_BUFFER, size, points_color, GL_DYNAMIC_DRAW);
-//
-//        #ifdef GL_INTEROP
-//            // create OpenCL buffer from GL VBO
-//            vbo_cl_colors = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
-//        #else
-//            // create standard OpenCL mem buffer
-//            vbo_cl = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
-//        #endif
-//        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
-//    }
-//    else
-//    {
-//        // create standard OpenCL mem buffer
-//        vbo_cl_colors = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
 //        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    }
 //}

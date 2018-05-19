@@ -1,9 +1,9 @@
 // ! entities are POINTS
 
-#define NO_POINTS                   7
+#define NO_POINTS                   100
 #define LIMIT_PROXIMITY             0.04
 #define MAX_POINTS_ON_LIMIT         6
-#define BACK_OFF                    0.005
+#define BACK_OFF                    0.0005
 #define BOUNCING_SPEED_MODIFIER     0.95
 #define GRAVITATIONAL_FORCE         0.0005
 #define FRICTION_FORCE              0.9999
@@ -52,6 +52,46 @@ __kernel void move_to_target_path_faithful(__global float2* pos, __global float2
 
     pos[gid].x = pos[gid].x + 0.0005 * sign_x * (obstacle_exists == 0);// + back_off.x * (obstacle_exists != 0);
     pos[gid].y = pos[gid].y + 0.0005 * sign_y * (obstacle_exists == 0);// + back_off.y * (obstacle_exists != 0);
+}
+
+__kernel void labirinth(__global float2* pos, __global float2* target, __global int* matrix_x, __global int* matrix_y)
+{
+    unsigned int gid = get_global_id(0);
+
+    float sign_x = (target[gid].x - pos[gid].x ) > 0;
+    float sign_y = (target[gid].y - pos[gid].y) > 0;
+
+    int point_x = (int) (pos[gid].x * 100 + 96 + .5);
+    int point_y = (int) (pos[gid].y * 100 + 96 + .5);
+
+    int point_x_in_matrix = 193 * point_y + point_x;
+    int point_y_in_matrix = 193 * point_x + point_y;
+
+    int up      = point_y_in_matrix - 1;
+    int down    = point_y_in_matrix + 1;
+    int left    = point_x_in_matrix - 1;
+    int right   = point_x_in_matrix + 1;
+
+    int obstacle_up         = (matrix_x[point_x_in_matrix] == 1) && (matrix_y[up] == 1);
+    int obstacle_up_left    = (matrix_x[left] == 1) && (matrix_y[up] == 1);
+    int obstacle_up_right   = (matrix_x[right] == 1) && (matrix_y[up] == 1);
+    int obstacle_left       = (matrix_x[left] == 1) && (matrix_y[point_y_in_matrix] == 1);
+    int obstacle_right      = (matrix_x[right] == 1) && (matrix_y[point_y_in_matrix] == 1);
+    int obstacle_down       = (matrix_x[point_x_in_matrix] == 1) && (matrix_y[down] == 1);
+    int obstacle_down_left  = (matrix_x[left] == 1) && (matrix_y[down] == 1);
+    int obstacle_down_right = (matrix_x[right] == 1) && (matrix_y[down] == 1);
+
+    int obstacle_exists = obstacle_up || obstacle_up_left || obstacle_up_right || obstacle_left
+                       || obstacle_right || obstacle_down || obstacle_down_left || obstacle_down_right;
+
+    int obstacle_for_x = obstacle_left + obstacle_right;
+    int obstacle_for_y = obstacle_up + obstacle_down;
+
+    int go_down = ((0 - pos[gid].y >= -0.5) || (0 - pos[gid].y >= 0.5)) * (obstacle_right || obstacle_left);
+    int go_left = ((0 - pos[gid].x >= -0.5) || (0 - pos[gid].x >= 0.5)) * (obstacle_up || obstacle_down);
+
+    pos[gid].x += 0.001 * sign_x * (obstacle_for_x == 0) - 0.001 * (obstacle_for_x != 0 && obstacle_for_y == 0);
+    pos[gid].y += 0.001 * sign_y * (obstacle_for_y == 0) - 0.001 * (obstacle_for_y != 0);
 }
 
 __kernel void compute_velocity(__global float2* position, __global float2* old_position, __global float2* velocity)
