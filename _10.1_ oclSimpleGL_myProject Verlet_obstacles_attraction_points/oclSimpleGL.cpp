@@ -101,6 +101,28 @@ void createVBOMatrixX(GLuint* vbo);
 void createVBOMatrixY(GLuint* vbo);
 
 /**
+ *  LOOKAHEAD X & Y MATRIX MAPPING
+ */
+GLfloat *lookahead_x;
+GLfloat *lookahead_y;
+GLuint vbo_lookahead_x;
+GLuint vbo_lookahead_y;
+cl_mem vbo_cl_lookahead_x;
+cl_mem vbo_cl_lookahead_y;
+
+void createVBOLookaheadX(GLuint* vbo);
+void createVBOLookaheadY(GLuint* vbo);
+
+/**
+ *  ACTIVATION MATIX MAPPING
+ */
+GLint *activated;
+GLuint vbo_activated;
+cl_mem vbo_cl_activated;
+
+void createVBOActivated(GLuint* vbo);
+
+/**
  *  OBSTACLES POSITIONS DEFINITION
  */
 int     no_obstacles;
@@ -439,6 +461,9 @@ int main(int argc, char** argv)
     createVBOObstaclePositions(&vbo_obstacle_positions);
     createVBOObstacleColors(&vbo_obstacle_colors);
     createVBOPointsTarget(&vbo_points_target);
+    createVBOLookaheadX(&vbo_lookahead_x);
+    createVBOLookaheadY(&vbo_lookahead_y);
+    createVBOActivated(&vbo_activated);
 
 //    createVBOTargetPositions(&vbo_target_positions);
 //    createVBOColors(&vbo_colors);
@@ -457,6 +482,9 @@ int main(int argc, char** argv)
     ciErrNum |= clSetKernelArg(ckKernel_labirinth, 3, sizeof(cl_mem), (void *) &vbo_cl_matrix_y);
     ciErrNum |= clSetKernelArg(ckKernel_labirinth, 4, sizeof(cl_mem), (void *) &vbo_cl_neighbours_x);
     ciErrNum |= clSetKernelArg(ckKernel_labirinth, 5, sizeof(cl_mem), (void *) &vbo_cl_neighbours_y);
+    ciErrNum |= clSetKernelArg(ckKernel_labirinth, 6, sizeof(cl_mem), (void *) &vbo_cl_lookahead_x);
+    ciErrNum |= clSetKernelArg(ckKernel_labirinth, 7, sizeof(cl_mem), (void *) &vbo_cl_lookahead_y);
+    ciErrNum |= clSetKernelArg(ckKernel_labirinth, 8, sizeof(cl_mem), (void *) &vbo_cl_activated);
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 
 //    ciErrNum  = clSetKernelArg(ckKernel_neighbours, 0, sizeof(cl_mem), (void *) &vbo_cl_points_position);
@@ -569,6 +597,12 @@ void runKernel()
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
     ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_neighbours_y, 0, 0, 0 );
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_lookahead_x, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_lookahead_y, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_activated, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_positions, 0, 0, 0 );
 //    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum |= clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_target_positions, 0, 0, 0 );
@@ -613,6 +647,9 @@ void runKernel()
     ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_matrix_y, 0, 0, 0 );
     ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_neighbours_x, 0, 0, 0 );
     ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_neighbours_y, 0, 0, 0 );
+    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_lookahead_x, 0, 0, 0 );
+    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_lookahead_y, 0, 0, 0 );
+    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_activated, 0, 0, 0 );
 //    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_positions, 0, 0, 0 );
 //    ciErrNum |= clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_target_positions, 0, 0, 0 );
 //    ciErrNum |= clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_old_positions, 0, 0, 0 );
@@ -700,6 +737,8 @@ void DisplayGL()
 
 /**
  *  INITIALIZE MATRIX
+ *  also initializes the lookahead matrices
+ *  also initializes the activated matrix
  */
 void init_matrix()
 {
@@ -711,6 +750,11 @@ void init_matrix()
     matrix = new GLfloat [2 * matrix_size];
     matrix_x = new GLint [matrix_size];
     matrix_y = new GLint [matrix_size];
+
+    lookahead_x = new GLfloat[2 * matrix_size];
+    lookahead_y = new GLfloat[2 * matrix_size];
+
+    activated   = new GLint[2 * matrix_size];
 
     int matrix_size_index = -1;
     int matrix_xy_index   = -1;
@@ -727,20 +771,33 @@ void init_matrix()
             matrix_xy_index += 1;
             matrix_x[matrix_xy_index] = 0;
             matrix_y[matrix_xy_index] = 0;
+
+            lookahead_x[2 * matrix_xy_index]     = 0.0f;
+            lookahead_x[2 * matrix_xy_index + 1] = 0.0f;
+            lookahead_y[2 * matrix_xy_index]     = 0.0f;
+            lookahead_y[2 * matrix_xy_index + 1] = 0.0f;
+
+            activated[2 * matrix_xy_index]     = 0;
+            activated[2 * matrix_xy_index + 1] = 0;
         }
 
         m_position_y += m_increment_position_y;
         m_position_x = -0.96;
     }
 
-    printf("LAST Y float: %f\n", m_position_y);
-    int m_position_y_int = (int) (m_position_y * 100 + .5);
-    printf("LAST Y int: %d\n", m_position_y_int);
+    //printf("LAST Y float: %f\n", m_position_y);
+    //int m_position_y_int = (int) (m_position_y * 100 + .5);
+    //printf("LAST Y int: %d\n", m_position_y_int);
 }
 
 /**
  *  MAP OBSTACLES TO MATRIX
+ *  also populates the lookahead matrices
  */
+
+int attraction_up_set = 0;
+int attraction_down_set = 0;
+
 void map_obstacles_to_matrix()
 {
     for (int i = 0; i < no_obstacles / 2; i++)
@@ -758,8 +815,14 @@ void map_obstacles_to_matrix()
         int min_x_start = m_position_x_int_start < m_position_x_int_end ? m_position_x_int_start : m_position_x_int_end;
         int min_y_start = m_position_y_int_start < m_position_y_int_end ? m_position_y_int_start : m_position_y_int_end;
 
-        int max_x_end = min_x_start + fabs(m_position_x_int_start - m_position_x_int_end);
-        int max_y_end = min_y_start + fabs(m_position_y_int_start - m_position_y_int_end);
+        int max_x_end = min_x_start + abs(m_position_x_int_start - m_position_x_int_end);
+        int max_y_end = min_y_start + abs(m_position_y_int_start - m_position_y_int_end);
+
+        float min_y_start_position = obstacle_positions[4 * i + 1] < obstacle_positions[4 * i + 3] ? obstacle_positions[4 * i + 1] : obstacle_positions[4 * i + 3];
+        float max_y_end_position = obstacle_positions[4 * i + 1] < obstacle_positions[4 * i + 3] ? obstacle_positions[4 * i + 3] : obstacle_positions[4 * i + 1];
+
+        printf("min position Y: %d & max position Y %d\n", m_position_y_int_start, m_position_y_int_end);
+        printf("min position Y: %f & max position Y %f\n", min_y_start_position, max_y_end_position);
 
 //        printf("min max X: %d %d  | %f %f ", min_x_start, max_x_end, obstacle_positions[4 * i], obstacle_positions[4 * i + 2]);
 //        printf("%f %f\n", (m_position_x_int_start - 96) / 100, (m_position_x_int_end - 96) / 100);
@@ -771,9 +834,34 @@ void map_obstacles_to_matrix()
             for (int j = min_y_start; j <= max_y_end; j++)
             {
                 matrix_y[j] = 1;
+
+                lookahead_y[2 * j]     = min_y_start_position;
+                lookahead_y[2 * j + 1] = max_y_end_position;
+
+                if (attraction_up_set == 0)
+                {
+                    activated[2 * j]    = 1;
+                    activated[2 * j + 1]    = 1;
+                }
+
+                if (attraction_up_set == 1 && attraction_down_set == 0)
+                {
+                    activated[2 * j+ 1] = 1;
+                    activated[2 * j]    = 1;
+                }
             }
             matrix_x[k] = 1;
+
+//            lookahead_x[2 * k] = min_x_start;
+//            lookahead_x[2 * k + 1] = max_x_end;
         }
+
+        if (attraction_up_set == 1)
+        {
+            attraction_down_set = 1;
+        }
+
+        attraction_up_set = 1;
     }
 }
 
@@ -1144,9 +1232,103 @@ void createVBOMatrixY(GLuint* vbo)
     }
 }
 
-/**
- *  NEIGHBOURS X MATRIX
- */
+/** LOOKAHEAD X VBO */
+void createVBOLookaheadX(GLuint* vbo)
+{
+     // create VBO
+    unsigned int size = matrix_size * 2 * sizeof(GLfloat);
+
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, lookahead_x, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_lookahead_x = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_lookahead_x = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_lookahead_x = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** LOOKAHEAD Y VBO */
+void createVBOLookaheadY(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = matrix_size * 2 * sizeof(GLfloat);
+
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, lookahead_y, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_lookahead_y = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_lookahead_y = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_lookahead_y = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** ACTIVATED VBO */
+void createVBOActivated(GLuint* vbo)
+{
+    // create VBO
+    unsigned int size = matrix_size * 2 * sizeof(GLint);
+
+    if(!bQATest)
+    {
+        // create buffer object
+        glGenBuffers(1, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+
+        // initialize buffer object
+        glBufferData(GL_ARRAY_BUFFER, size, activated, GL_DYNAMIC_DRAW);
+
+        #ifdef GL_INTEROP
+            // create OpenCL buffer from GL VBO
+            vbo_cl_activated = clCreateFromGLBuffer(cxGPUContext, CL_MEM_READ_WRITE, *vbo, NULL);
+        #else
+            // create standard OpenCL mem buffer
+            vbo_cl_activated = clCreateBuffer(cxGPUContext, CL_MEM_WRITE_ONLY, size, NULL, &ciErrNum);
+        #endif
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+    else
+    {
+        // create standard OpenCL mem buffer
+        vbo_cl_activated = clCreateBuffer(cxGPUContext, CL_MEM_READ_WRITE, size, NULL, &ciErrNum);
+        shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    }
+}
+
+/** NEIGHBOURS X MATRIX VBO */
 void createVBONeighboursX(GLuint* vbo)
 {
     // create VBO

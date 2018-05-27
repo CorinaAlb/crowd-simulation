@@ -1,19 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
+	<File name="world.ads" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="11702" topLine="1" />
+		</Cursor>
+	</File>
 	<File name="simpleGL.cl" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2517" topLine="35" />
+			<Cursor1 position="3178" topLine="45" />
 		</Cursor>
 	</File>
 	<File name="oclSimpleGL.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="26992" topLine="280" />
+			<Cursor1 position="31494" topLine="745" />
 		</Cursor>
-	</File>
-	<File name="world.ads" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="11702" topLine="97" />
-		</Cursor>
+		<Folding>
+			<Collapse line="547" />
+			<Collapse line="686" />
+			<Collapse line="1129" />
+			<Collapse line="1140" />
+			<Collapse line="1172" />
+			<Collapse line="1204" />
+			<Collapse line="1236" />
+			<Collapse line="1268" />
+			<Collapse line="1300" />
+			<Collapse line="1332" />
+			<Collapse line="1362" />
+			<Collapse line="1366" />
+			<Collapse line="1398" />
+			<Collapse line="1429" />
+			<Collapse line="1460" />
+			<Collapse line="1492" />
+			<Collapse line="1524" />
+			<Collapse line="1555" />
+			<Collapse line="1586" />
+			<Collapse line="1617" />
+			<Collapse line="1648" />
+			<Collapse line="1678" />
+		</Folding>
 	</File>
 </CodeBlocks_layout_file>
