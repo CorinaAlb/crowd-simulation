@@ -114,6 +114,14 @@ __kernel void labirinth(__global float2* pos, __global float2* target,
     neighbours_y[new_point_y_in_matrix] = 1;
 }
 
+
+__kernel void activate_deactivate_obstacle_attraction(int start_index_y, int end_start, int value, __global int* activated)
+{
+    unsigned int gid = get_global_id(0) + start_index_y;
+
+    activated[2 * gid + end_start] = value;
+}
+
 //__kernel void compute_velocity(__global float2* position, __global float2* old_position, __global float2* velocity)
 //{
 //    unsigned int gid = get_global_id(0);

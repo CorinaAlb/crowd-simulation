@@ -134,6 +134,19 @@ cl_mem  vbo_cl_obstacle_positions;
 void createVBOObstaclePositions(GLuint* vbo);
 
 /**
+ *  OBSTACLES Y RANGES
+ */
+GLint* start_index_y_obstacle;
+GLint* end_index_y_obstacle;
+GLuint vbo_start_index_y_obstacle;
+GLuint vbo_end_index_y_obstacle;
+cl_mem vbo_cl_start_index_y_obstacle;
+cl_mem vbo_cl_end_index_y_obstacle;
+
+void createVBOStartIndexTObstacle(GLuint* vbo);
+void createVBOEndIndexTObstacle(GLuint* vbo);
+
+/**
  *  OBSTACLES COLOR DEFINITION
  */
 GLfloat *obstacle_colors;
@@ -175,6 +188,14 @@ void createVBOPointsTarget(GLuint* vbo);
  */
 int no_attractions;
 
+
+/**
+ *  ATTRACTION KERNEL USER INPUT
+ */
+int start_index_y;
+int end_start;
+int value;
+int no_points_obstacle = 1;
 
 // vbo variables
 
@@ -232,6 +253,7 @@ void timerEvent(int value);
  *  KERNELS
  */
 cl_kernel ckKernel_labirinth;
+cl_kernel ckKernel_activate_deactivate_obstacle_attraction;
 //cl_kernel ckKernel_neighbours;
 //cl_kernel ckKernel_create_collision_map;
 //cl_kernel ckKernel_compute_velocity;
@@ -241,6 +263,7 @@ cl_kernel ckKernel_labirinth;
 //cl_kernel ckKernel_attraction;
 
 // Helpers
+void KeyboardGL(unsigned char key, int x, int y);
 void Cleanup(int iExitCode);
 void (*pCleanup)(int) = &Cleanup;
 
@@ -437,6 +460,8 @@ int main(int argc, char** argv)
      */
     ckKernel_labirinth = clCreateKernel(cpProgram, "labirinth", &ciErrNum);
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+    ckKernel_activate_deactivate_obstacle_attraction = clCreateKernel(cpProgram, "activate_deactivate_obstacle_attraction", &ciErrNum);
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ckKernel_neighbours = clCreateKernel(cpProgram, "neighbours", &ciErrNum);
 //    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ckKernel_move_to_target_path_faithful = clCreateKernel(cpProgram, "move_to_target_path_faithful", &ciErrNum);
@@ -464,6 +489,8 @@ int main(int argc, char** argv)
     createVBOLookaheadX(&vbo_lookahead_x);
     createVBOLookaheadY(&vbo_lookahead_y);
     createVBOActivated(&vbo_activated);
+//    createVBOStartIndexTObstacle(&vbo_start_index_y_obstacle);
+//    createVBOEndIndexTObstacle(&vbo_end_index_y_obstacle);
 
 //    createVBOTargetPositions(&vbo_target_positions);
 //    createVBOColors(&vbo_colors);
@@ -485,6 +512,9 @@ int main(int argc, char** argv)
     ciErrNum |= clSetKernelArg(ckKernel_labirinth, 6, sizeof(cl_mem), (void *) &vbo_cl_lookahead_x);
     ciErrNum |= clSetKernelArg(ckKernel_labirinth, 7, sizeof(cl_mem), (void *) &vbo_cl_lookahead_y);
     ciErrNum |= clSetKernelArg(ckKernel_labirinth, 8, sizeof(cl_mem), (void *) &vbo_cl_activated);
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+
+    ciErrNum  = clSetKernelArg(ckKernel_activate_deactivate_obstacle_attraction, 3, sizeof(cl_mem), (void *) &vbo_cl_activated);
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 
 //    ciErrNum  = clSetKernelArg(ckKernel_neighbours, 0, sizeof(cl_mem), (void *) &vbo_cl_points_position);
@@ -559,6 +589,7 @@ void InitGL(int* argc, char** argv)
 
     // register GLUT callback functions
     glutDisplayFunc(DisplayGL);
+    glutKeyboardFunc(KeyboardGL);
 	glutTimerFunc(REFRESH_DELAY, timerEvent,0);
 
 	// initialize necessary OpenGL extensions
@@ -603,6 +634,10 @@ void runKernel()
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
     ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_activated, 0, 0, 0 );
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+//    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_start_index_y_obstacle, 0, 0, 0 );
+//    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+//    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_end_index_y_obstacle, 0, 0, 0 );
+//    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum  = clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_positions, 0, 0, 0 );
 //    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum |= clEnqueueAcquireGLObjects(cqCommandQueue, 1, &vbo_cl_target_positions, 0, 0, 0 );
@@ -624,8 +659,15 @@ void runKernel()
 //    }
 #endif
     size_t szGlobalWorkSize[] = {(size_t) no_points, 1};
-//    size_t szGlobalWorkSizeDouble[] = {(size_t) no_points, 2};
-//    size_t szGlobalWorkSizeAttraction[] = {(size_t) no_attractions, 1};
+    size_t szGlobalWorkSizeObstacle[] = {(size_t) no_points_obstacle, 1};
+
+    ciErrNum  = clSetKernelArg(ckKernel_activate_deactivate_obstacle_attraction, 0, sizeof(int), &start_index_y);
+    ciErrNum |= clSetKernelArg(ckKernel_activate_deactivate_obstacle_attraction, 1, sizeof(int), &end_start);
+    ciErrNum |= clSetKernelArg(ckKernel_activate_deactivate_obstacle_attraction, 2, sizeof(int), &value);
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
+
+    ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_activate_deactivate_obstacle_attraction, 1, NULL, szGlobalWorkSizeObstacle, NULL, 0, 0, 0 );
+    shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
     ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_labirinth, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
     shrCheckErrorEX(ciErrNum, CL_SUCCESS, pCleanup);
 //    ciErrNum = clEnqueueNDRangeKernel(cqCommandQueue, ckKernel_neighbours, 1, NULL, szGlobalWorkSize, NULL, 0, 0, 0 );
@@ -650,6 +692,8 @@ void runKernel()
     ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_lookahead_x, 0, 0, 0 );
     ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_lookahead_y, 0, 0, 0 );
     ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_activated, 0, 0, 0 );
+//    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_start_index_y_obstacle, 0, 0, 0 );
+//    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_end_index_y_obstacle, 0, 0, 0 );
 //    ciErrNum  = clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_positions, 0, 0, 0 );
 //    ciErrNum |= clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_target_positions, 0, 0, 0 );
 //    ciErrNum |= clEnqueueReleaseGLObjects(cqCommandQueue, 1, &vbo_cl_old_positions, 0, 0, 0 );
@@ -677,6 +721,176 @@ void runKernel()
 
     glUnmapBufferARB(GL_ARRAY_BUFFER);
 #endif
+}
+
+int value_0 = 0;
+int value_1 = 0;
+int value_2 = 0;
+int value_3 = 0;
+int value_4 = 0;
+int value_5 = 0;
+int value_6 = 0;
+int value_7 = 0;
+int value_8 = 0;
+int value_9 = 0;
+int value_10 = 0;
+int value_11 = 0;
+int value_12 = 0;
+int value_13 = 0;
+
+/**
+ *  KEYBOARD CONTROL
+ */
+void KeyboardGL(unsigned char key, int x, int y)
+{
+    switch(key)
+    {
+         case 033: // octal equivalent of the Escape key
+            glutLeaveMainLoop();
+            break;
+        case '0':
+            {
+                no_points_obstacle = end_index_y_obstacle[0] - start_index_y_obstacle[0] + 1;
+                start_index_y = start_index_y_obstacle[0];
+                end_start = 0;
+                value_0 = 1 - value_0;
+
+                value = value_0;
+            }
+            break;
+        case '1':
+            {
+                no_points_obstacle = end_index_y_obstacle[0] - start_index_y_obstacle[0] + 1;
+                start_index_y = start_index_y_obstacle[0];
+                end_start = 1;
+                value_1 = (1- value_1);
+
+                value = value_1;
+            }
+            break;
+        case '2':
+            {
+                no_points_obstacle = end_index_y_obstacle[1] - start_index_y_obstacle[1] + 1;
+                start_index_y = start_index_y_obstacle[1];
+                end_start = 0;
+                value_2 = (1- value_2);
+
+                value = value_2;
+            }
+            break;
+        case '3':
+            {
+                no_points_obstacle = end_index_y_obstacle[1] - start_index_y_obstacle[1] + 1;
+                start_index_y = start_index_y_obstacle[1];
+                end_start = 1;
+                value_3 = (1- value_3);
+
+                value = value_3;
+            }
+            break;
+        case '4':
+            {
+                no_points_obstacle = end_index_y_obstacle[2] - start_index_y_obstacle[2] + 1;
+                start_index_y = start_index_y_obstacle[2];
+                end_start = 0;
+                value_4 = (1- value_4);
+
+                value = value_4;
+            }
+            break;
+        case '5':
+            {
+                no_points_obstacle = end_index_y_obstacle[2] - start_index_y_obstacle[2] + 1;
+                start_index_y = start_index_y_obstacle[2];
+                end_start = 1;
+                value_5 = (1- value_5);
+
+                value = value_5;
+            }
+            break;
+        case '6':
+            {
+                no_points_obstacle = end_index_y_obstacle[3] - start_index_y_obstacle[3] + 1;
+                start_index_y = start_index_y_obstacle[3];
+                end_start = 0;
+                value_6 = (1- value_6);
+
+                value = value_6;
+            }
+            break;
+        case '7':
+            {
+                no_points_obstacle = end_index_y_obstacle[3] - start_index_y_obstacle[3] + 1;
+                start_index_y = start_index_y_obstacle[3];
+                end_start = 1;
+                value_7 = (1- value_7);
+
+                value = value_7;
+            }
+            break;
+        case '8':
+            {
+                no_points_obstacle = end_index_y_obstacle[4] - start_index_y_obstacle[4] + 1;
+                start_index_y = start_index_y_obstacle[4];
+                end_start = 0;
+                value_8 = (1- value_8);
+
+                value = value_8;
+            }
+            break;
+        case '9':
+            {
+                no_points_obstacle = end_index_y_obstacle[4] - start_index_y_obstacle[4] + 1;
+                start_index_y = start_index_y_obstacle[4];
+                end_start = 1;
+                value_9 = (1- value_9);
+
+                value = value_9;
+            }
+            break;
+         case 100: // octal code for d
+            {
+                no_points_obstacle = end_index_y_obstacle[5] - start_index_y_obstacle[5] + 1;
+                start_index_y = start_index_y_obstacle[5];
+                end_start = 0;
+                value_10 = (1- value_10);
+
+                value = value_10;
+            }
+            break;
+         case 119: // octal code for w
+            {
+                no_points_obstacle = end_index_y_obstacle[5] - start_index_y_obstacle[5] + 1;
+                start_index_y = start_index_y_obstacle[5];
+                end_start = 1;
+                value_11 = (1- value_11);
+
+                value = value_11;
+            }
+            break;
+         case 101: // octal code for e
+            {
+                no_points_obstacle = end_index_y_obstacle[6] - start_index_y_obstacle[6] + 1;
+                start_index_y = start_index_y_obstacle[6];
+                end_start = 0;
+                value_12 = (1- value_12);
+
+                value = value_12;
+            }
+            break;
+         case 114: // octal code for r
+            {
+                no_points_obstacle = end_index_y_obstacle[6] - start_index_y_obstacle[6] + 1;
+                start_index_y = start_index_y_obstacle[6];
+                end_start = 1;
+                value_13 = (1- value_13);
+
+                value = value_13;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 int time_increment = 0;
@@ -784,22 +998,17 @@ void init_matrix()
         m_position_y += m_increment_position_y;
         m_position_x = -0.96;
     }
-
-    //printf("LAST Y float: %f\n", m_position_y);
-    //int m_position_y_int = (int) (m_position_y * 100 + .5);
-    //printf("LAST Y int: %d\n", m_position_y_int);
 }
 
 /**
  *  MAP OBSTACLES TO MATRIX
  *  also populates the lookahead matrices
  */
-
-int attraction_up_set = 0;
-int attraction_down_set = 0;
-
 void map_obstacles_to_matrix()
 {
+    start_index_y_obstacle = new GLint[no_obstacles];
+    end_index_y_obstacle   = new GLint[no_obstacles];
+
     for (int i = 0; i < no_obstacles / 2; i++)
     {
         int start_x = (int) (obstacle_positions[4 * i] * 100 + 96 + .5);
@@ -821,13 +1030,8 @@ void map_obstacles_to_matrix()
         float min_y_start_position = obstacle_positions[4 * i + 1] < obstacle_positions[4 * i + 3] ? obstacle_positions[4 * i + 1] : obstacle_positions[4 * i + 3];
         float max_y_end_position = obstacle_positions[4 * i + 1] < obstacle_positions[4 * i + 3] ? obstacle_positions[4 * i + 3] : obstacle_positions[4 * i + 1];
 
-        printf("min position Y: %d & max position Y %d\n", m_position_y_int_start, m_position_y_int_end);
-        printf("min position Y: %f & max position Y %f\n", min_y_start_position, max_y_end_position);
-
-//        printf("min max X: %d %d  | %f %f ", min_x_start, max_x_end, obstacle_positions[4 * i], obstacle_positions[4 * i + 2]);
-//        printf("%f %f\n", (m_position_x_int_start - 96) / 100, (m_position_x_int_end - 96) / 100);
-//        printf("min max Y: %d %d  | %f %f ", min_y_start, max_y_end, obstacle_positions[4 * i + 1], obstacle_positions[4 * i + 3]);
-//        printf("%f %f\n", (m_position_y_int_start - 96) / 100, (m_position_y_int_end - 96) / 100);
+        start_index_y_obstacle[i] = min_y_start;
+        end_index_y_obstacle[i]   = max_y_end;
 
         for (int k = min_x_start; k <= max_x_end; k++)
         {
@@ -837,31 +1041,10 @@ void map_obstacles_to_matrix()
 
                 lookahead_y[2 * j]     = min_y_start_position;
                 lookahead_y[2 * j + 1] = max_y_end_position;
-
-                if (attraction_up_set == 0)
-                {
-                    activated[2 * j]    = 1;
-                    activated[2 * j + 1]    = 1;
-                }
-
-                if (attraction_up_set == 1 && attraction_down_set == 0)
-                {
-                    activated[2 * j+ 1] = 1;
-                    activated[2 * j]    = 1;
-                }
             }
+
             matrix_x[k] = 1;
-
-//            lookahead_x[2 * k] = min_x_start;
-//            lookahead_x[2 * k + 1] = max_x_end;
         }
-
-        if (attraction_up_set == 1)
-        {
-            attraction_down_set = 1;
-        }
-
-        attraction_up_set = 1;
     }
 }
 
@@ -885,8 +1068,6 @@ void map_points_to_neighbours()
         }
     }
 
-    printf("!!! point possitions number: %d\n", no_points);
-
     for (int i = 0; i < no_points; i++)
     {
         int pos_x = (int) (points_position[2 * i] * 100 + 96 + .5);
@@ -894,8 +1075,6 @@ void map_points_to_neighbours()
 
         int n_position_x = 193 * pos_y + pos_x;
         int n_position_y = 193 * pos_x + pos_y;
-
-        printf("%d. index in NEIGHBOURS matrix: %d %d \n", i, n_position_x, n_position_y);
 
         neighbours_x[n_position_x] = 1;
         neighbours_y[n_position_y] = 1;
