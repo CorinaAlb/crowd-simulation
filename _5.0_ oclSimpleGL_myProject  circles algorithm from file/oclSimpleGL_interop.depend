@@ -248,3 +248,19 @@
 	<oclUtils.h>
 	<shrQATest.h>
 
+1522945746 source:/home/corina/CodeBlocks projects/crowd-simulation/_5.0_ oclSimpleGL_myProject  circles algorithm from file/oclSimpleGL.cpp
+	<windows.h>
+	<GL/glew.h>
+	<OpenGL/OpenGL.h>
+	<GLUT/glut.h>
+	<GL/freeglut.h>
+	<GL/glx.h>
+	<memory>
+	<iostream>
+	<cassert>
+	<vector>
+	<fstream>
+	<string>
+	<oclUtils.h>
+	<shrQATest.h>
+

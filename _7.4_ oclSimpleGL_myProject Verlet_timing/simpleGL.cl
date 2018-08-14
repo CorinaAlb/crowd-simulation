@@ -1,6 +1,6 @@
 // ! entities are POINTS
 
-#define NO_POINTS                   100
+#define NO_POINTS                   600
 #define LIMIT_PROXIMITY             0.02
 #define MAX_POINTS_ON_LIMIT         6
 #define BACK_OFF                    0.005

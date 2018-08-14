@@ -509,9 +509,13 @@ void DisplayGL()
 
     time_sum += stop.tv_usec - start.tv_usec;
 
-    if (time_increment == 200 )
+    if (time_increment == 100)
     {
-        printf("took %lu\n", time_sum / 200);
+        int time = time_sum / 100;
+        if (time < 9999)
+        {
+            printf("took %d\n", abs(time));
+        }
         time_increment = 0;
         time_sum  = 0;
     }
@@ -586,6 +590,7 @@ void init_world()
 
                         points_old_position[++no_old_points_index] = old_position_x;
                         points_old_position[++no_old_points_index] = old_position_y;
+
                     }
                     else if (strstr(info, "position"))
                     {
@@ -633,8 +638,8 @@ void init_world()
         }
     }
 
-    int no_points_index = 1;
-    int no_old_points_index = 1;
+    int no_points_index = 3;
+    int no_old_points_index = 3;
 
     for (int i=2; i<no_points; i++)
     {

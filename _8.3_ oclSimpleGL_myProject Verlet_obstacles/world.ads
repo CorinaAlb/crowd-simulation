@@ -1,5 +1,5 @@
-no_dots:2
-no_attractions:1
+no_dots:1
+no_attractions:0
 no_obstacles:14
 obstacle|position -0.6 1.0|color 0.0 0.5 0.7 0.0
 obstacle|position -0.6 0.1|color 1.0 1.0 1.0 0.0

@@ -13,17 +13,6 @@
 __kernel void move_to_target_path_faithful(__global float2* pos, __global float* path_faithful,
                             __global float2* velocity, __global float* gravitational_influence)
 {
-//    unsigned int gid = get_global_id(0);
-//
-//    int x_outside = fabs(pos[gid].x) >= 0.8f;
-//    int y_outside = fabs(pos[gid].y) >= 0.8f;
-//    int x_inside = !x_outside;
-//    int y_inside = !y_outside;
-//
-//    pos[gid].x += velocity[gid].x * (x_inside - x_outside);// * (sign_x != 0)* (obstacle_exists == 0 || path_faithful[gid] == 1) + back_off.x * (obstacle_exists != 0 && path_faithful[gid] == 0);
-//    pos[gid].y += velocity[gid].y * (y_inside - y_outside);// * sign_y * (obstacle_exists == 0 || path_faithful[gid] == 1) + back_off.y * (obstacle_exists != 0 && path_faithful[gid] == 0);
-//    pos[gid].y -= GRAVITATIONAL_FORCE * (velocity[gid].y != 0.0f);
-
     unsigned int gid = get_global_id(0);
 
     float2 current_point = (float2) pos[gid];
@@ -89,86 +78,97 @@ __kernel void attraction(__global float2* pos, __global int2* attraction_influen
     pos[influenced_point_index].y += ( (sign_y == 1) - (sign_y != 1) ) * ATTRACTION_FORCE;
 }
 
-__kernel void map_obstacles_to_pieces(__global float4 pieces_coordinates_x, __global float4 pieces_coordinates_y,
-                    __global float2 obstacle_positions, __global float2 starting_points_obstacles, __global float2 ending_points_obstacles, int no_obstacles)
-{
-    unsigned int gid = get_global_id(0);
-
-    float up_left_x = fabs(pieces_coordinates_x[gid * 4 + 0]);
-    float up_right_x = fabs(pieces_coordinates_x[gid * 4 + 1]);
-    float down_left_x = fabs(pieces_coordinates_x[gid * 4 + 2]);
-    float down_right_x = fabs(pieces_coordinates_x[gid * 4 + 3]);
-    float up_left_y = fabs(pieces_coordinates_y[gid * 4 + 0]);
-    float up_right_y = fabs(pieces_coordinates_y[gid * 4 + 1]);
-    float down_left_y = fabs(pieces_coordinates_y[gid * 4 + 2]);
-    float down_right_y = fabs(pieces_coordinates_y[gid * 4 + 3]);
-
-    float max_x = pieces_coordinates_x[gid * 4 + 1];
-    float min_x = pieces_coordinates_x[gid * 4 + 0];
-    float max_y = pieces_coordinates_y[gid * 4 + 0];
-    float min_y = pieces_coordinates_y[gid * 4 + 2];
-
-    // !!!
-    // all obstacles are horizontal or vertical  lines
-    int obstacles_index = gid * 5;
-
-    for (int i=0; i<no_obstacles; i++)
-    {
-        float fabs_start_obstacle_position_x = fabs(obstacle_positions[i * 2].x);
-        float fabs_start_obstacle_position_y = fabs(obstacle_positions[i * 2].y);
-        float fabs_end_obstacle_position_x = fabs(obstacle_positions[i * 2 + 1].x);
-        float fabs_end_obstacle_position_y = fabs(obstacle_positions[i * 2 + 1].y);
-
-        float start_obstacle_position_x = obstacle_positions[i * 2].x;
-        float start_obstacle_position_y = obstacle_positions[i * 2].y;
-        float end_obstacle_position_x = obstacle_positions[i * 2 + 1].x;
-        float end_obstacle_position_y = obstacle_positions[i * 2 + 1].y;
-
-        // MANHATTAN
-        int start_point_inside_x = (start_obstacle_position_x > up_left_x) && (start_obstacle_position_x < up_right_x);
-        int start_point_inside_y = (start_obstacle_position_y < up_left_y) && (start_obstacle_position_y > down_left_y);
-        int end_point_inside_x = (end_obstacle_position_x > up_left_x) && (end_obstacle_position_x < up_right_x);
-        int end_point_inside_y = (end_obstacle_position_y < up_left_y) && (end_obstacle_position_y > down_left_y);
-
-        int start_point_inside = (start_point_inside_x == 1) && (start_point_inside_y == 1);
-        int end_point_inside = (end_point_inside_x == 1) && (end_point_inside_y == 1);
-
-        // 1. end point inside & start point inside
-        int case_one = (start_point_inside == 1) && (end_point_inside == 1);
-
-        // 2. end point outside & start point inside
-        int case_two = (start_point_inside == 1) && (end_point_inside == 0);
-
-        // 3. end point inside & start point outside
-        int case_three = (start_point_inside == 0) && (end_point_inside == 1);
-
-        // 4. end point outside & start point outside
-        int case_four = (start_point_inside == 0) && (end_point_inside == 0);
-
-        obstacles_index += 1;
-
-        starting_points_obstacles[obstacles_index].x = (case_one == 1) * start_obstacle_position_x
-            + (case_two == 1) * start_obstacle_position_x
-            + (case_three == 1) * (max_x * (start_obstacle_position_x > max_x) + min_x * (start_obstacle_position_x < min_x))
-            + (case_four == 1) * (min_x * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
-            + start_obstacle_position_x * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0));
-
-        starting_points_obstacles[obstacles_index].y = (case_one == 1) * start_obstacle_position_y
-            + (case_two == 1) * start_obstacle_position_y
-            + (case_three == 1) * (max_y * (start_obstacle_position_y > max_y) + min_y * (start_obstacle_position_y < min_y))
-            + (case_four == 1) * (max_y * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0)
-            + start_obstacle_position_y * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1));
-
-        ending_points_obstacles[obstacles_index].x = (case_one == 1) * end_obstacle_position_x
-            + (case_two == 1) * (max_x * (end_obstacle_position_x >= max_x) + min_x * (end_obstacle_position_x =< min_x))
-            + (case_three == 1) * end_obstacle_position_x
-            + (case_four == 1) * (max_x * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
-            + end_obstacle_position_x * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0));
-
-        ending_points_obstacles[obstacles_index].y = (case_one == 1) * end_obstacle_position_y
-            + (case_two == 1) * (max_y * (end_obstacle_position_y >= max_y) + min_y * (end_obstacle_position_y =< min_y))
-            + (case_three == 1) * end_obstacle_position_y
-            + (case_four == 1) * (min_y * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0)
-            + end_obstacle_position_y * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1));
-    }
-}
+//__kernel void map_obstacles_to_pieces(__global float4* pieces_coordinates_x, __global float4* pieces_coordinates_y,
+//                    __global float2* obstacle_positions, __global float2* starting_points_obstacles, __global float2* ending_points_obstacles, int no_obstacles)
+//{
+//    unsigned int gid = get_global_id(0);
+//
+//    float up_left_x = fabs(pieces_coordinates_x[gid * 4 + 0]);
+//    float up_right_x = fabs(pieces_coordinates_x[gid * 4 + 1]);
+//    float down_left_x = fabs(pieces_coordinates_x[gid * 4 + 2]);
+//    float down_right_x = fabs(pieces_coordinates_x[gid * 4 + 3]);
+//    float up_left_y = fabs(pieces_coordinates_y[gid * 4 + 0]);
+//    float up_right_y = fabs(pieces_coordinates_y[gid * 4 + 1]);
+//    float down_left_y = fabs(pieces_coordinates_y[gid * 4 + 2]);
+//    float down_right_y = fabs(pieces_coordinates_y[gid * 4 + 3]);
+//
+//    float max_x = pieces_coordinates_x[gid * 4 + 1];
+//    float min_x = pieces_coordinates_x[gid * 4 + 0];
+//    float max_y = pieces_coordinates_y[gid * 4 + 0];
+//    float min_y = pieces_coordinates_y[gid * 4 + 2];
+//
+//    // !!!
+//    // all obstacles are horizontal or vertical  lines
+//    int obstacles_index = gid * 5;
+//
+//    for (int i=0; i<no_obstacles; i++)
+//    {
+//        float fabs_start_obstacle_position_x = fabs(obstacle_positions[i * 2].x);
+//        float fabs_start_obstacle_position_y = fabs(obstacle_positions[i * 2].y);
+//        float fabs_end_obstacle_position_x = fabs(obstacle_positions[i * 2 + 1].x);
+//        float fabs_end_obstacle_position_y = fabs(obstacle_positions[i * 2 + 1].y);
+//
+//        float start_obstacle_position_x = obstacle_positions[i * 2].x;
+//        float start_obstacle_position_y = obstacle_positions[i * 2].y;
+//        float end_obstacle_position_x = obstacle_positions[i * 2 + 1].x;
+//        float end_obstacle_position_y = obstacle_positions[i * 2 + 1].y;
+//
+//        // MANHATTAN
+//        int start_point_inside_x = (start_obstacle_position_x > up_left_x) && (start_obstacle_position_x < up_right_x);
+//        int start_point_inside_y = (start_obstacle_position_y < up_left_y) && (start_obstacle_position_y > down_left_y);
+//        int end_point_inside_x = (end_obstacle_position_x > up_left_x) && (end_obstacle_position_x < up_right_x);
+//        int end_point_inside_y = (end_obstacle_position_y < up_left_y) && (end_obstacle_position_y > down_left_y);
+//
+//        int start_point_inside = (start_point_inside_x == 1) && (start_point_inside_y == 1);
+//        int end_point_inside = (end_point_inside_x == 1) && (end_point_inside_y == 1);
+//
+//        // 1. end point inside & start point inside
+//        int case_one = (start_point_inside == 1) && (end_point_inside == 1);
+//
+//        // 2. end point outside & start point inside
+//        int case_two = (start_point_inside == 1) && (end_point_inside == 0);
+//
+//        // 3. end point inside & start point outside
+//        int case_three = (start_point_inside == 0) && (end_point_inside == 1);
+//
+//        // 4. end point outside & start point outside
+//        int case_four = (start_point_inside == 0) && (end_point_inside == 0);
+//
+//        obstacles_index += 1;
+//
+//        starting_points_obstacles[obstacles_index].x += (case_one == 1) * start_obstacle_position_x
+//            + (case_two == 1) * start_obstacle_position_x
+//            + (case_three == 1) * (max_x * (start_obstacle_position_x > max_x) + min_x * (start_obstacle_position_x < min_x))
+//            + (case_four == 1) * (min_x * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
+//            + start_obstacle_position_x * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0));
+//
+//        starting_points_obstacles[obstacles_index].y += (case_one == 1) * start_obstacle_position_y
+//            + (case_two == 1) * start_obstacle_position_y
+//            + (case_three == 1) * (max_y * (start_obstacle_position_y > max_y) + min_y * (start_obstacle_position_y < min_y))
+//            + (case_four == 1) * (max_y * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0)
+//            + start_obstacle_position_y * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1));
+//
+//        ending_points_obstacles[obstacles_index].x += (case_one == 1) * end_obstacle_position_x
+//            + (case_two == 1) * (max_x * (end_obstacle_position_x >= max_x) + min_x * (end_obstacle_position_x =< min_x))
+//            + (case_three == 1) * end_obstacle_position_x
+//            + (case_four == 1) * (max_x * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1)
+//            + end_obstacle_position_x * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0));
+//
+//        ending_points_obstacles[obstacles_index].y += (case_one == 1) * end_obstacle_position_y
+//            + (case_two == 1) * (max_y * (end_obstacle_position_y >= max_y) + min_y * (end_obstacle_position_y =< min_y))
+//            + (case_three == 1) * end_obstacle_position_y
+//            + (case_four == 1) * (min_y * (start_point_inside_x == 1 && end_point_inside_x == 1 && end_point_inside_y == 0 && start_point_inside_y == 0)
+//            + end_obstacle_position_y * (start_point_inside_x == 0 && end_point_inside_x == 0 && end_point_inside_y == 1 && start_point_inside_y == 1));
+//    }
+//}
+//
+//// for only one point, find the label and compute collision detection in same kernel
+//__kernel void map_current_possition_to_piece(__global float2* position, __global float4* pieces_coordinates_x, __global float4* pieces_coordinates_y)
+//{
+//    unsigned int gid = get_global_id(0);
+//
+//    // find the piece the current position belongs to
+//    float2 current_position = (float2) position[gid];
+//
+//
+//}

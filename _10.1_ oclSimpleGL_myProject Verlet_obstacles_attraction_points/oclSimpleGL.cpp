@@ -598,7 +598,7 @@ void InitGL(int* argc, char** argv)
     shrCheckErrorEX(bGLEW, shrTRUE, pCleanup);
 
     // default initialization
-    glClearColor(0.0, 0.25, 0.25, 0.5);
+    glClearColor(1.0, 1.0, 1.0, 0.5);
     glDisable(GL_DEPTH_TEST);
 
     // viewport
@@ -918,7 +918,7 @@ void DisplayGL()
     glBindBuffer(GL_ARRAY_BUFFER, vbo_points_color);
     glColorPointer(4, GL_FLOAT, 0, 0);
 
-    glPointSize(2*MIN_POINT_SIZE);
+    glPointSize(3*MIN_POINT_SIZE);
     glDrawArrays(GL_POINTS, 0, no_points);
 
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -933,6 +933,7 @@ void DisplayGL()
     glDrawArrays(GL_LINES, 0, no_obstacles);
 
     glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
 
     // flip backbuffer to screen
     glutSwapBuffers();

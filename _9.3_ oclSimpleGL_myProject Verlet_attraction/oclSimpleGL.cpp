@@ -417,7 +417,7 @@ void InitGL(int* argc, char** argv)
     shrCheckErrorEX(bGLEW, shrTRUE, pCleanup);
 
     // default initialization
-    glClearColor(0.0, 0.25, 0.25, 0.5);
+    glClearColor(1.0, 1.0, 1.0, 0.5);
     glDisable(GL_DEPTH_TEST);
 
     // viewport
@@ -486,8 +486,50 @@ void runKernel()
 #endif
 }
 
+void perform_cpu()
+{
+    for (int i=0; i<no_points; i++)
+    {
+        float current_point_x = points_position[i];
+        float current_point_y = points_position[i];
+
+        int obstacle_exists = 0;
+
+        float back_off[2];
+        back_off[0] = 0.0f;
+        back_off[1] = 0.0f;
+
+        int x_outside = 1<0;
+        int y_outside = 1<0;
+        int x_inside = !x_outside;
+        int y_inside = !y_outside;
+
+        for (int j = 0; j < no_points; j++)
+        {
+            float point_x = points_position[i];
+            int influenced = (i != j) && (current_point_x - point_x <= 0.4) && (current_point_x - point_x <= 0.4);
+
+            obstacle_exists += influenced;
+
+            int obstacle_x_sign = ( points_position[i] - points_position[j]) > 0.0f;
+            int obstacle_y_sign = ( points_position[i] - points_position[j]) > 0.0f;
+
+            // obstacle_sign = 0 => - sign
+            // obstacle_sign > 0 => + sign
+
+            back_off[0] += influenced * ((obstacle_x_sign == 1) - (obstacle_x_sign != 1)) * 1;
+            back_off[1] += influenced * ((obstacle_y_sign == 1) - (obstacle_y_sign != 1)) * 1;
+        }
+
+        points_position[i] += (x_inside - x_outside);// * ( velocity[gid].x * (path_faithful[gid] == 1)) + (path_faithful[gid] == 0) * back_off.x;//+ (obstacle_exists > 0 && path_faithful[gid] == 0) * back_off.x );
+        points_position[i] += (y_inside - y_outside);// * ( velocity[gid].y * (path_faithful[gid] == 1)) + (path_faithful[gid] == 0) * back_off.y;//+ (obstacle_exists > 0 && path_faithful[gid] == 0) * back_off.y );
+        points_position[i] -= 0.2 * (fabs(points_position[i]) < 0.855f);
+    }
+
+}
+
 int time_increment = 0;
-int time_sum = 0;
+long int time_sum = 0;
 // Display callback
 //*****************************************************************************
 void DisplayGL()
@@ -495,7 +537,8 @@ void DisplayGL()
     gettimeofday(&start, NULL);
 
     // run OpenCL kernel to generate vertex positions
-    runKernel();
+    //runKernel();
+    perform_cpu();
     time_increment++;
 
     // clear graphics then render from the vbo
@@ -511,7 +554,7 @@ void DisplayGL()
     glBindBuffer(GL_ARRAY_BUFFER, vbo_colors);
     glColorPointer(4, GL_FLOAT, 0, 0);
 
-    glPointSize(10);
+    glPointSize(20);
     glDrawArrays(GL_POINTS, 0, no_points);
 
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -525,7 +568,10 @@ void DisplayGL()
 
     if (time_increment == 100)
     {
-        printf("took %lu\n", time_sum / 100);
+         printf("Time in microseconds: %ld microseconds\n",
+            ((stop.tv_sec - start.tv_sec)*1000000L
+           +stop.tv_usec) - start.tv_usec
+          ); // Added semicolon
         time_increment = 0;
         time_sum  = 0;
     }

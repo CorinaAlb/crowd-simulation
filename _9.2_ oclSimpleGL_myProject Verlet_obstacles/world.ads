@@ -15,107 +15,106 @@ obstacle|position 0.3 -0.3|color 0.0 0.5 0.7 0.0
 obstacle|position 0.3 -0.85|color 1.0 1.0 1.0 0.0
 obstacle|position 0.5 0.2|color 1.0 1.0 1.0 0.0
 obstacle|position 0.5 -0.5|color 1.0 1.0 1.0 0.0
-dot|position -0.85 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.85 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.75 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.65 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.55 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.45 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.35 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.25 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position -0.15 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-dot|position -0.05 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.6|gravitation 0|slow_down 0
-dot|position 0.0 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|target 0.79 0.2|gravitation 0|slow_down 0
-
+dot|position -0.85 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.9
+dot|position -0.75 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.9
+dot|position -0.65 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.8
+dot|position -0.55 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.8
+dot|position -0.45 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.85
+dot|position -0.35 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.85
+dot|position -0.25 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.7
+dot|position -0.15 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.7
+dot|position -0.05 0.85|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.6
+dot|position 0.0 -0.85|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.6
+dot|position -0.85 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.5
+dot|position -0.75 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.5
+dot|position -0.65 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.4
+dot|position -0.55 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.4
+dot|position -0.45 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.3
+dot|position -0.35 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.3
+dot|position -0.25 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.2
+dot|position -0.15 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.2
+dot|position -0.05 0.75|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 0.1
+dot|position 0.0 -0.75|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.9 -0.1
+dot|position -0.85 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.9
+dot|position -0.75 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.9
+dot|position -0.65 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.8
+dot|position -0.55 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.8
+dot|position -0.45 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.85
+dot|position -0.35 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.85
+dot|position -0.25 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.7
+dot|position -0.15 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.7
+dot|position -0.05 0.65|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.6
+dot|position 0.0 -0.65|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.6
+dot|position -0.85 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.5
+dot|position -0.75 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.5
+dot|position -0.65 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.4
+dot|position -0.55 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.4
+dot|position -0.45 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.3
+dot|position -0.35 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.3
+dot|position -0.25 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.2
+dot|position -0.15 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.2
+dot|position -0.05 0.55|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.1
+dot|position 0.0 -0.55|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 -0.1
+dot|position -0.85 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.85 0.0
+dot|position -0.75 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.0
+dot|position -0.65 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.9
+dot|position -0.55 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.9
+dot|position -0.45 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.8
+dot|position -0.35 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.8
+dot|position -0.25 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.85
+dot|position -0.15 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.85
+dot|position -0.05 0.45|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.7
+dot|position 0.0 -0.45|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.7
+dot|position -0.85 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.6
+dot|position -0.75 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.6
+dot|position -0.65 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.5
+dot|position -0.55 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.5
+dot|position -0.45 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.4
+dot|position -0.35 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.4
+dot|position -0.25 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.3
+dot|position -0.15 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.3
+dot|position -0.05 0.35|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.2
+dot|position 0.0 -0.35|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.2
+dot|position -0.85 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 0.1
+dot|position -0.75 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.8 -0.1
+dot|position -0.65 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.9
+dot|position -0.55 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.9
+dot|position -0.45 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.8
+dot|position -0.35 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.8
+dot|position -0.25 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.85
+dot|position -0.15 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.85
+dot|position -0.05 0.25|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.7
+dot|position 0.0 -0.25|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.7
+dot|position -0.85 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.6
+dot|position -0.75 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.6
+dot|position -0.65 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.5
+dot|position -0.55 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.5
+dot|position -0.45 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.4
+dot|position -0.35 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.4
+dot|position -0.25 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.3
+dot|position -0.15 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.3
+dot|position -0.05 0.15|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.2
+dot|position 0.0 -0.15|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.2
+dot|position -0.85 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.1
+dot|position -0.75 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.1
+dot|position -0.65 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 0.0
+dot|position -0.55 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.75 -0.8
+dot|position -0.45 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 0.9
+dot|position -0.35 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 -0.9
+dot|position -0.25 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 0.8
+dot|position -0.15 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 -0.8
+dot|position -0.05 0.05|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 0.85
+dot|position 0.0 -0.05|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 -0.85
+dot|position -0.85 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 0.7
+dot|position -0.75 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 -0.7
+dot|position -0.65 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 0.6
+dot|position -0.55 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 -0.6
+dot|position -0.45 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 0.5
+dot|position -0.35 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 -0.5
+dot|position -0.25 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 0.4
+dot|position -0.15 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 -0.4
+dot|position -0.05 0.0|old_pos -0.8 0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 0.3
+dot|position 0.0 0.0|old_pos -0.4 -0.6|color 1.0 0.0 0.0 0.0|path_faithful 1|gravitation 0|target 0.7 -0.3
 dot|position 0.6 -0.6|old_pos 0.6 -0.6|color 1.0 1.0 1.0 0.0|path_faithful 0|gravitation 0|attracted_by 0
 dot|position 0.6 -0.4|old_pos 0.6 -0.4|color 0.0 1.0 1.0 0.0|path_faithful 0|gravitation 0|attracted_by 0
 dot|position 0.6 -0.2|old_pos 0.6 -0.2|color 0.0 1.0 1.0 0.0|path_faithful 0|gravitation 0|attracted_by 0

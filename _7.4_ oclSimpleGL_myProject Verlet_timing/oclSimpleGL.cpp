@@ -488,6 +488,8 @@ void runKernel()
 #endif
 }
 
+int time_counter = 0;
+int time_sum = 0;
 // Display callback
 //*****************************************************************************
 void DisplayGL()
@@ -496,6 +498,7 @@ void DisplayGL()
 
     // run OpenCL kernel to generate vertex positions
     runKernel();
+    time_counter++;
 
     // clear graphics then render from the vbo
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -520,7 +523,14 @@ void DisplayGL()
 
     gettimeofday(&stop, NULL);
 
-    printf("took %lu\n", stop.tv_usec - start.tv_usec);
+    time_sum += stop.tv_usec - start.tv_usec;
+
+    if (time_counter == 200)
+    {
+        printf("took %lu\n", time_sum/200);
+        time_sum = 0;
+        time_counter = 0;
+    }
 }
 
 void init_world()

@@ -1,76 +1,34 @@
 // ! entities are POINTS
 
-#define NO_POINTS                   100
-#define LIMIT_PROXIMITY             0.04
-#define MAX_POINTS_ON_LIMIT         6
-#define BACK_OFF                    0.0005
+#define BACK_OFF                    0.005
 #define BOUNCING_SPEED_MODIFIER     0.95
-#define GRAVITATIONAL_FORCE         0.0005
-#define FRICTION_FORCE              0.9999
+#define GRAVITATIONAL_FORCE         0.005
 #define ATTRACTION_FORCE            0.005
 
-// 2. the obstacle changes position. the entity that is moving does not change it's route
-__kernel void move_to_target_path_faithful(__global float2* pos, __global float2* target, __global float* path_faithful,
-                            __global float2* velocity, __global float* gravitational_influence)
+__kernel void labirinth(__global float2* pos, __global float2* target,
+                        __global int* matrix_x, __global int* matrix_y,
+                        __global int* neighbours_x, __global int* neighbours_y)
 {
     unsigned int gid = get_global_id(0);
 
-//    float2 current_point = (float2) pos[gid];
+    float2 current_point = (float2) pos[gid];
 
-    int obstacle_exists = 0;
-
-//    float2 back_off = (float2) (0.0f, 0.0f);
-
-    float sign_x = (target[gid].x - pos[gid].x) > 0;
-    float sign_y = (target[gid].y - pos[gid].y) > 0;
-
-    int x_outside = fabs(pos[gid].x) >= 0.8f;
-    int y_outside = fabs(pos[gid].y) >= 0.8f;
-    int x_inside = !x_outside;
-    int y_inside = !y_outside;
-
-//    for (int i = 0; i < NO_POINTS; i++)
-//    {
-//        float2 point = (float2) pos[i];
-//        int influenced = (i != gid) && (fabs(current_point.x - point.x) <= LIMIT_PROXIMITY) && (fabs(current_point.y - point.y) <= LIMIT_PROXIMITY);
-//
-//        obstacle_exists += influenced;
-//
-//        int obstacle_x_sign = ( pos[gid].x - pos[i].x ) > 0.0f;
-//        int obstacle_y_sign = ( pos[gid].y - pos[i].y ) > 0.0f;
-//
-//        // obstacle_sign = 0 => - sign
-//        // obstacle_sign > 0 => + sign
-//
-//        back_off.x += influenced * ((obstacle_x_sign == 1) - (obstacle_x_sign != 1)) * BACK_OFF;
-//        back_off.y += influenced * ((obstacle_y_sign == 1) - (obstacle_y_sign != 1)) * BACK_OFF;
-//    }
-
-//    pos[gid].x += (x_inside - x_outside) * ( velocity[gid].x * (path_faithful[gid] == 1));// + (obstacle_exists > 0 && path_faithful[gid] == 0) * back_off.x );
-//    pos[gid].y += (y_inside - y_outside) * ( velocity[gid].y * (path_faithful[gid] == 1));// + (obstacle_exists > 0 && path_faithful[gid] == 0) * back_off.y );
-//    pos[gid].y -= GRAVITATIONAL_FORCE * (fabs(pos[gid].y) < 0.855f) * (gravitational_influence[gid] == 1.0f);
-
-    pos[gid].x = pos[gid].x + 0.0005 * sign_x * (obstacle_exists == 0);// + back_off.x * (obstacle_exists != 0);
-    pos[gid].y = pos[gid].y + 0.0005 * sign_y * (obstacle_exists == 0);// + back_off.y * (obstacle_exists != 0);
-}
-
-__kernel void labirinth(__global float2* pos, __global float2* target, __global int* matrix_x, __global int* matrix_y)
-{
-    unsigned int gid = get_global_id(0);
-
-    float sign_x = (target[gid].x - pos[gid].x ) > 0;
-    float sign_y = (target[gid].y - pos[gid].y) > 0;
-
-    int point_x = (int) (pos[gid].x * 100 + 96 + .5);
-    int point_y = (int) (pos[gid].y * 100 + 96 + .5);
+    int point_x = (int) (current_point.x * 100 + 96 + .5);
+    int point_y = (int) (current_point.y * 100 + 96 + .5);
 
     int point_x_in_matrix = 193 * point_y + point_x;
     int point_y_in_matrix = 193 * point_x + point_y;
 
-    int up      = point_y_in_matrix - 1;
-    int down    = point_y_in_matrix + 1;
+    int down    = point_y_in_matrix - 1;
+    int up      = point_y_in_matrix + 1;
     int left    = point_x_in_matrix - 1;
     int right   = point_x_in_matrix + 1;
+
+    /**
+     *   FOLLOW THE TARGET & AVOID OBSTACLES
+     */
+    float sign_x = (target[gid].x - pos[gid].x) > 0;
+    float sign_y = (target[gid].y - pos[gid].y) > 0;
 
     int obstacle_up         = (matrix_x[point_x_in_matrix] == 1) && (matrix_y[up] == 1);
     int obstacle_up_left    = (matrix_x[left] == 1) && (matrix_y[up] == 1);
@@ -90,8 +48,51 @@ __kernel void labirinth(__global float2* pos, __global float2* target, __global 
     int go_down = ((0 - pos[gid].y >= -0.5) || (0 - pos[gid].y >= 0.5)) * (obstacle_right || obstacle_left);
     int go_left = ((0 - pos[gid].x >= -0.5) || (0 - pos[gid].x >= 0.5)) * (obstacle_up || obstacle_down);
 
-    pos[gid].x += 0.001 * sign_x * (obstacle_for_x == 0) - 0.001 * (obstacle_for_x != 0 && obstacle_for_y == 0);
-    pos[gid].y += 0.001 * sign_y * (obstacle_for_y == 0) - 0.001 * (obstacle_for_y != 0);
+    pos[gid].x += (0.001 * sign_x * (obstacle_for_x == 0) - 0.001 * (obstacle_for_x != 0 && obstacle_for_y == 0));// * ((go_left == 0) - (go_left != 0));
+    pos[gid].y += (0.001 * sign_y * (obstacle_for_y == 0) - 0.001 * (obstacle_for_y != 0));// * (go_down != 0);// - (go_down == 0));
+
+     /**
+     *  AVOID NEIGHBOUR COLLISION
+     */
+    float2 back_off = (float2) (0.0f, 0.0f);
+
+    int neighbour_up         = (neighbours_x[point_x_in_matrix] == 1) && (neighbours_y[up] == 1);
+    int neighbour_up_left    = (neighbours_x[left] == 1) && (neighbours_y[up] == 1);
+    int neighbour_up_right   = (neighbours_x[right] == 1) && (neighbours_y[up] == 1);
+    int neighbour_left       = (neighbours_x[left] == 1) && (neighbours_y[point_y_in_matrix] == 1);
+    int neighbour_right      = (neighbours_x[right] == 1) && (neighbours_y[point_y_in_matrix] == 1);
+    int neighbour_down       = (neighbours_x[point_x_in_matrix] == 1) && (neighbours_y[down] == 1);
+    int neighbour_down_left  = (neighbours_x[left] == 1) && (neighbours_y[down] == 1);
+    int neighbour_down_right = (neighbours_x[right] == 1) && (neighbours_y[down] == 1);
+
+    int neighbour_exists = neighbour_up || neighbour_up_left || neighbour_up_right || neighbour_left
+                        || neighbour_right || neighbour_down || neighbour_down_left || neighbour_down_right;
+
+    int neighbour_for_x = neighbour_left + neighbour_right;
+    int neighbour_for_y = neighbour_up + neighbour_down;
+
+    back_off.x += (neighbour_left == 1 || neighbour_down_left == 1 || neighbour_up_left == 1) * BACK_OFF * (obstacle_right == 0 || obstacle_up_right == 0 || obstacle_down_right == 0)
+            - (neighbour_right == 1 || neighbour_up_right == 1 || neighbour_down_right == 1) * BACK_OFF * (obstacle_left == 0 || obstacle_up_left == 0 || obstacle_down_left == 0);
+    back_off.y += (neighbour_down == 1 || neighbour_down_left == 1 || neighbour_down_right == 1) * BACK_OFF * (obstacle_up == 0 || obstacle_up_right == 0 || obstacle_up_left == 0)
+            - (neighbour_up == 1 || neighbour_up_right == 1 || neighbour_up_left == 1) * BACK_OFF * (obstacle_down == 0 || obstacle_down_right == 0 || obstacle_down_left == 0);
+
+    neighbours_x[point_x_in_matrix] = 0;
+    neighbours_y[point_y_in_matrix] = 0;
+
+    pos[gid].x += back_off.x;
+    pos[gid].y += back_off.y;
+
+    /**
+     *  UPDATE NEIGHBOURS COLLISION MATRIX
+     */
+    int new_point_x = (int) (pos[gid].x * 100 + 96 + .5);
+    int new_point_y = (int) (pos[gid].y * 100 + 96 + .5);
+
+    int new_point_x_in_matrix = 193 * new_point_y + new_point_x;
+    int new_point_y_in_matrix = 193 * new_point_x + new_point_y;
+
+    neighbours_x[new_point_x_in_matrix] = 1;
+    neighbours_y[new_point_y_in_matrix] = 1;
 }
 
 __kernel void compute_velocity(__global float2* position, __global float2* old_position, __global float2* velocity)
